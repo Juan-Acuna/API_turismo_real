@@ -19,6 +19,7 @@ namespace API_TurismoReal
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
+                .UseUrls("http://*:5000;https://turismoreal.xyz:8080")
                 .UseStartup<Startup>();
     }
 }

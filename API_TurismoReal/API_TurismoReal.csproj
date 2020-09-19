@@ -6,8 +6,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Models\CreadorChofer.cs~RF46b9666.TMP" />
+    <None Remove="Models\PersonaChofer.cs~RF4c919ea.TMP" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.3" />
+    <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="2.19.90" />
   </ItemGroup>
 
 </Project>
