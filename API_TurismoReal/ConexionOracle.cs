@@ -11,7 +11,7 @@ namespace API_TurismoReal
         private const String SOURCE = "localhost:1521";//OFFLINE
         //private const String SOURCE = "85.208.***.***:1521";//ONLINE
         private static String USER = "turismo_real";
-        private static String PASSWD = "******";
+        private static String PASSWD = "432";
         private static String CON_STR = "DATA SOURCE=" + SOURCE + ";USER ID=" + USER + ";PASSWORD=" + PASSWD + ";";
         public static OracleConnection _con = new OracleConnection(CON_STR);
         private static ConexionOracle _instancia = new ConexionOracle();
