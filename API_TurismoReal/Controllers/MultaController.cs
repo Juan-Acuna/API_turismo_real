@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Conection;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models;
@@ -15,6 +16,7 @@ namespace API_TurismoReal.Controllers
     {
         OracleCommandManager cmd = new OracleCommandManager(ConexionOracle.Conexion);
 
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> Get()
         {
@@ -33,6 +35,7 @@ namespace API_TurismoReal.Controllers
             }
             return BadRequest();
         }
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> Get([FromRoute]int id)
         {
@@ -51,6 +54,7 @@ namespace API_TurismoReal.Controllers
             }
             return BadRequest();
         }
+        [Authorize(Roles = "2,4")]
         [HttpPost]
         public async Task<IActionResult> Post([FromBody]Multa m)
         {
@@ -68,6 +72,7 @@ namespace API_TurismoReal.Controllers
             }
             return BadRequest();
         }
+        [Authorize(Roles = "2,4")]
         [HttpPatch]
         public async Task<IActionResult> Patch([FromBody]Multa m)
         {
@@ -84,7 +89,7 @@ namespace API_TurismoReal.Controllers
                 return Ok();
             }
             return BadRequest();
-        }
+        }/*
         [HttpDelete]
         public async Task<IActionResult> Delete([FromBody]Multa m)
         {
@@ -101,6 +106,6 @@ namespace API_TurismoReal.Controllers
                 return Ok();
             }
             return BadRequest();
-        }
+        }*/
     }
 }

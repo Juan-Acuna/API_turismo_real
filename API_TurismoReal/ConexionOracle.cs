@@ -9,9 +9,9 @@ namespace API_TurismoReal
     public class ConexionOracle
     {
         private const String SOURCE = "localhost:1521";//OFFLINE
-        //private const String SOURCE = "85.208.22.168:1521";//ONLINE
+        //private const String SOURCE = "85.208.***.***:1521";//ONLINE
         private static String USER = "turismo_real";
-        private static String PASSWD = "123";
+        private static String PASSWD = "******";
         private static String CON_STR = "DATA SOURCE=" + SOURCE + ";USER ID=" + USER + ";PASSWORD=" + PASSWD + ";";
         public static OracleConnection _con = new OracleConnection(CON_STR);
         private static ConexionOracle _instancia = new ConexionOracle();

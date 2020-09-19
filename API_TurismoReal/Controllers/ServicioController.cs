@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Conection;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models;
@@ -51,6 +52,7 @@ namespace API_TurismoReal.Controllers
             }
             return BadRequest();
         }
+        [Authorize(Roles = "3")]
         [HttpPost]
         public async Task<IActionResult> Post([FromBody]Servicio s)
         {
@@ -68,6 +70,7 @@ namespace API_TurismoReal.Controllers
             }
             return BadRequest();
         }
+        [Authorize(Roles = "3")]
         [HttpPatch]
         public async Task<IActionResult> Patch([FromBody]Servicio s)
         {
@@ -85,6 +88,7 @@ namespace API_TurismoReal.Controllers
             }
             return BadRequest();
         }
+        [Authorize(Roles = "3")]
         [HttpDelete]
         public async Task<IActionResult> Delete([FromBody]Servicio s)
         {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Conection;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models;
@@ -15,6 +16,7 @@ namespace API_TurismoReal.Controllers
     {
         OracleCommandManager cmd = new OracleCommandManager(ConexionOracle.Conexion);
 
+        [Authorize(Roles = "1,3")]
         [HttpGet]
         public async Task<IActionResult> Get()
         {
@@ -42,6 +44,7 @@ namespace API_TurismoReal.Controllers
             }
             return BadRequest();
         }
+        [Authorize(Roles = "1,3")]
         [HttpGet("{id}")]
         public async Task<IActionResult> Get([FromRoute]int id)
         {
@@ -64,6 +67,7 @@ namespace API_TurismoReal.Controllers
             }
             return BadRequest();
         }
+        [Authorize(Roles = "1")]
         [HttpPost]
         public async Task<IActionResult> Post([FromBody]PersonaChofer creador)
         {
@@ -87,6 +91,7 @@ namespace API_TurismoReal.Controllers
             }
             return BadRequest();
         }
+        [Authorize(Roles = "1")]
         [HttpPatch]
         public async Task<IActionResult> Patch([FromBody]Chofer chofer)
         {
@@ -104,6 +109,7 @@ namespace API_TurismoReal.Controllers
             }
             return BadRequest();
         }
+        [Authorize(Roles = "1")]
         [HttpDelete]
         public async Task<IActionResult> Delete([FromBody]Chofer chofer)
         {

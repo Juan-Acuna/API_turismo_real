@@ -63,7 +63,7 @@ namespace API_TurismoReal.Controllers
             }
             //return StatusCode(418);
         }
-
+        [Authorize(Roles ="1")]
         [HttpGet]
         public async Task<IActionResult> Get()
         {
@@ -91,7 +91,7 @@ namespace API_TurismoReal.Controllers
             }
             return BadRequest();
         }
-
+        [Authorize]
         [HttpGet("{username}")]
         public async Task<IActionResult> Get([FromRoute]String username)
         {
@@ -142,7 +142,7 @@ namespace API_TurismoReal.Controllers
             }
             return BadRequest();
         }
-
+        [Authorize]
         [HttpPatch]
         public async Task<IActionResult> Patch([FromBody]Usuario usuario)
         {
