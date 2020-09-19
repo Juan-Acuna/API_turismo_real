@@ -6,7 +6,7 @@
 *.user
 *.userosscache
 *.sln.docstates
-ConexionOracle.cs
+API_TurismoReal/ConexionOracle.cs
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
