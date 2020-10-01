@@ -24,7 +24,7 @@ namespace API_TurismoReal.Controllers
                 ConexionOracle.Open();
                 if (!ConexionOracle.Activa)
                 {
-                    return StatusCode(504, "No se pudo establecer comunicacion con la base de datos");
+                    return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
             List<Articulo> art = await cmd.GetAll<Articulo>();
@@ -43,7 +43,7 @@ namespace API_TurismoReal.Controllers
                 ConexionOracle.Open();
                 if (!ConexionOracle.Activa)
                 {
-                    return StatusCode(504, "No se pudo establecer comunicacion con la base de datos");
+                    return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
             Articulo a = await cmd.Get<Articulo>(id);
@@ -62,7 +62,7 @@ namespace API_TurismoReal.Controllers
                 ConexionOracle.Open();
                 if (!ConexionOracle.Activa)
                 {
-                    return StatusCode(504, "No se pudo establecer comunicacion con la base de datos");
+                    return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
             if (await cmd.Insert(art))
@@ -80,7 +80,7 @@ namespace API_TurismoReal.Controllers
                 ConexionOracle.Open();
                 if (!ConexionOracle.Activa)
                 {
-                    return StatusCode(504, "No se pudo establecer comunicacion con la base de datos");
+                    return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
             if (await cmd.Update(art))
@@ -98,7 +98,7 @@ namespace API_TurismoReal.Controllers
                 ConexionOracle.Open();
                 if (!ConexionOracle.Activa)
                 {
-                    return StatusCode(504, "No se pudo establecer comunicacion con la base de datos");
+                    return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
             if (await cmd.Delete(art))

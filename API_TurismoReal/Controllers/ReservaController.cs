@@ -24,7 +24,7 @@ namespace API_TurismoReal.Controllers
                 ConexionOracle.Open();
                 if (!ConexionOracle.Activa)
                 {
-                    return StatusCode(504, "No se pudo establecer comunicacion con la base de datos");
+                    return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
             List<Reserva> r = await cmd.GetAll<Reserva>();
@@ -43,7 +43,7 @@ namespace API_TurismoReal.Controllers
                 ConexionOracle.Open();
                 if (!ConexionOracle.Activa)
                 {
-                    return StatusCode(504, "No se pudo establecer comunicacion con la base de datos");
+                    return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
             Reserva r = await cmd.Get<Reserva>(id);
@@ -62,7 +62,7 @@ namespace API_TurismoReal.Controllers
                 ConexionOracle.Open();
                 if (!ConexionOracle.Activa)
                 {
-                    return StatusCode(504, "No se pudo establecer comunicacion con la base de datos");
+                    return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
             if (await cmd.Insert(r))
@@ -80,7 +80,7 @@ namespace API_TurismoReal.Controllers
                 ConexionOracle.Open();
                 if (!ConexionOracle.Activa)
                 {
-                    return StatusCode(504, "No se pudo establecer comunicacion con la base de datos");
+                    return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
             if (await cmd.Update(r))
@@ -98,7 +98,7 @@ namespace API_TurismoReal.Controllers
                 ConexionOracle.Open();
                 if (!ConexionOracle.Activa)
                 {
-                    return StatusCode(504, "No se pudo establecer comunicacion con la base de datos");
+                    return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
             if (await cmd.Delete(r))

@@ -25,7 +25,7 @@ namespace API_TurismoReal.Controllers
                 ConexionOracle.Open();
                 if (!ConexionOracle.Activa)
                 {
-                    return StatusCode(504, "No se pudo establecer comunicacion con la base de datos");
+                    return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
             List<Chofer> chofer = await cmd.GetAll<Chofer>();
@@ -53,7 +53,7 @@ namespace API_TurismoReal.Controllers
                 ConexionOracle.Open();
                 if (!ConexionOracle.Activa)
                 {
-                    return StatusCode(504, "No se pudo establecer comunicacion con la base de datos");
+                    return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
             Chofer c = await cmd.Get<Chofer>(id);
@@ -76,7 +76,7 @@ namespace API_TurismoReal.Controllers
                 ConexionOracle.Open();
                 if (!ConexionOracle.Activa)
                 {
-                    return StatusCode(504, "No se pudo establecer comunicacion con la base de datos");
+                    return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
             Chofer chofer = creador.Chofer;
@@ -100,7 +100,7 @@ namespace API_TurismoReal.Controllers
                 ConexionOracle.Open();
                 if (!ConexionOracle.Activa)
                 {
-                    return StatusCode(504, "No se pudo establecer comunicacion con la base de datos");
+                    return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
             if (await cmd.Update(chofer))
@@ -118,7 +118,7 @@ namespace API_TurismoReal.Controllers
                 ConexionOracle.Open();
                 if (!ConexionOracle.Activa)
                 {
-                    return StatusCode(504, "No se pudo establecer comunicacion con la base de datos");
+                    return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
             if (await cmd.Delete(chofer))

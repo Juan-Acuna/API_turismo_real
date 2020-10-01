@@ -28,7 +28,7 @@ namespace API_TurismoReal.Controllers
                 ConexionOracle.Open();
                 if (!ConexionOracle.Activa)
                 {
-                    return StatusCode(504, "No se pudo establecer comunicacion con la base de datos");
+                    return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
             var p = new Procedimiento(ConexionOracle.Conexion, "SP_AUTENTICAR");
@@ -46,9 +46,9 @@ namespace API_TurismoReal.Controllers
                 switch (resultado)
                 {
                     case 0://Usuario no existe.
-                        return BadRequest("Usuario no existe.");
+                        return BadRequest(new { error="Usuario no existe." });
                     case 1://Contraseña incorrecta.
-                        return BadRequest("Contraseña incorrecta.");
+                        return BadRequest(new { error = "Contraseña incorrecta." });
                     case 2://Inicio exitoso.
                         usuario.Id_rol = Convert.ToInt32((decimal)(OracleDecimal)(p.Parametros["rol"].Value));
                         return Ok(Tools.GenerarToken(usuario));
@@ -72,7 +72,7 @@ namespace API_TurismoReal.Controllers
                 ConexionOracle.Open();
                 if (!ConexionOracle.Activa)
                 {
-                    return StatusCode(504, "No se pudo establecer comunicacion con la base de datos");
+                    return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
             List<Usuario> usuarios = await cmd.GetAll<Usuario>();
@@ -100,7 +100,7 @@ namespace API_TurismoReal.Controllers
                 ConexionOracle.Open();
                 if (!ConexionOracle.Activa)
                 {
-                    return StatusCode(504, "No se pudo establecer comunicacion con la base de datos");
+                    return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
             Usuario u = await cmd.Get<Usuario>(username);
@@ -124,7 +124,7 @@ namespace API_TurismoReal.Controllers
                 ConexionOracle.Open();
                 if (!ConexionOracle.Activa)
                 {
-                    return StatusCode(504, "No se pudo establecer comunicacion con la base de datos");
+                    return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
             Usuario usuario = creador.Usuario;
@@ -143,18 +143,68 @@ namespace API_TurismoReal.Controllers
             return BadRequest();
         }
         [Authorize]
-        [HttpPatch]
-        public async Task<IActionResult> Patch([FromBody]Usuario usuario)
+        [HttpPatch("{username}")]
+        public async Task<IActionResult> Patch([FromRoute]String username, [FromBody]dynamic data)
         {
             if (!ConexionOracle.Activa)
             {
                 ConexionOracle.Open();
                 if (!ConexionOracle.Activa)
                 {
-                    return StatusCode(504, "No se pudo establecer comunicacion con la base de datos");
+                    return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
-            if (await cmd.Update(usuario))
+            Usuario u = await cmd.Get<Usuario>(username);
+            Persona p = await cmd.Get<Persona>(u.Rut);
+            if (data.clave != null)
+            {
+                u.Clave = data.clave;
+            }
+            if (data.id_rol != null)
+            {
+                u.Id_rol = data.id_rol;
+            }
+            if (data.activo != null)
+            {
+                u.Activo = data.activo;
+            }
+            if (data.frecuente != null)
+            {
+                u.Frecuente = data.frecuente;
+            }
+            if (data.nombres != null)
+            {
+                p.Nombres = data.nombres;
+            }
+            if (data.apellidos != null)
+            {
+                p.Apellidos = data.apellidos;
+            }
+            if (data.email != null)
+            {
+                p.Email = data.email;
+            }
+            if (data.telefono != null)
+            {
+                p.Telefono = data.telefono;
+            }
+            if (data.direccion != null)
+            {
+                p.Direccion = data.direccion;
+            }
+            if (data.comuna != null)
+            {
+                p.Comuna = data.comuna;
+            }
+            if (data.region != null)
+            {
+                p.Region = data.region;
+            }
+            if (data.id_genero != null)
+            {
+                p.Id_genero = data.id_genero;
+            }
+            if (await cmd.Update(u))
             {
                 return Ok();
             }
@@ -170,7 +220,7 @@ namespace API_TurismoReal.Controllers
                 ConexionOracle.Open();
                 if (!ConexionOracle.Activa)
                 {
-                    return StatusCode(504, "No se pudo establecer comunicacion con la base de datos");
+                    return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
             if (await cmd.Delete(usuario))
@@ -179,22 +229,5 @@ namespace API_TurismoReal.Controllers
             }
             return BadRequest();
         }
-        /*[HttpDelete]
-        public async Task<IActionResult> Desactivar([FromBody]Usuario usuario)
-        {
-            if (!ConexionOracle.Activa)
-            {
-                ConexionOracle.Open();
-                if (!ConexionOracle.Activa)
-                {
-                    return StatusCode(504, "No se pudo establecer comunicacion con la base de datos");
-                }
-            }
-            if (await cmd.Delete(usuario))
-            {
-                return Ok();
-            }
-            return BadRequest();
-        }*/
     }
 }

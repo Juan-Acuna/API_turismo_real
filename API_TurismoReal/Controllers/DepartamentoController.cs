@@ -24,7 +24,7 @@ namespace API_TurismoReal.Controllers
                 ConexionOracle.Open();
                 if (!ConexionOracle.Activa)
                 {
-                    return StatusCode(504, "No se pudo establecer comunicacion con la base de datos");
+                    return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
             List<Departamento> depto = await cmd.GetAll<Departamento>();
@@ -42,7 +42,7 @@ namespace API_TurismoReal.Controllers
                 ConexionOracle.Open();
                 if (!ConexionOracle.Activa)
                 {
-                    return StatusCode(504, "No se pudo establecer comunicacion con la base de datos");
+                    return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
             Departamento d = await cmd.Get<Departamento>(id);
@@ -61,7 +61,7 @@ namespace API_TurismoReal.Controllers
                 ConexionOracle.Open();
                 if (!ConexionOracle.Activa)
                 {
-                    return StatusCode(504, "No se pudo establecer comunicacion con la base de datos");
+                    return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
             if (await cmd.Insert(depto))
@@ -71,18 +71,43 @@ namespace API_TurismoReal.Controllers
             return BadRequest();
         }
         [Authorize(Roles = "1")]
-        [HttpPatch]
-        public async Task<IActionResult> Patch([FromBody]Departamento depto)
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> Patch([FromRoute]int id, [FromBody]dynamic data)
         {
             if (!ConexionOracle.Activa)
             {
                 ConexionOracle.Open();
                 if (!ConexionOracle.Activa)
                 {
-                    return StatusCode(504, "No se pudo establecer comunicacion con la base de datos");
+                    return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
-            if (await cmd.Update(depto))
+            Departamento d = await cmd.Get<Departamento>(id);
+            if(data.nombre != null)
+            {
+                d.Nombre = data.nombre;
+            }
+            if (data.direccion != null)
+            {
+                d.Direccion = data.direccion;
+            }
+            if (data.arriendo != null)
+            {
+                d.Arriendo = data.arriendo;
+            }
+            if (data.habitaciones != null)
+            {
+                d.Habitaciones = data.habitaciones;
+            }
+            if (data.nombre != null)
+            {
+                d.Nombre = data.nombre;
+            }
+            if (data.nombre != null)
+            {
+                d.Nombre = data.nombre;
+            }
+            if (await cmd.Update(d))
             {
                 return Ok();
             }
@@ -97,7 +122,7 @@ namespace API_TurismoReal.Controllers
                 ConexionOracle.Open();
                 if (!ConexionOracle.Activa)
                 {
-                    return StatusCode(504, "No se pudo establecer comunicacion con la base de datos");
+                    return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
             if (await cmd.Delete(depto))
