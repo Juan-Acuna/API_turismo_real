@@ -106,37 +106,37 @@ namespace API_TurismoReal.Controllers
             Chofer c = await cmd.Get<Chofer>(id);
             Persona p = await cmd.Get<Persona>(c.Rut);
 
-            if (data.persona.nombres != null)
+            if (data.Persona.Nombres != null)
             {
-                p.Nombres = data.persona.nombres;
+                p.Nombres = data.Persona.Nombres;
             }
-            if (data.persona.apellidos != null)
+            if (data.Persona.Apellidos != null)
             {
-                p.Apellidos = data.persona.apellidos;
+                p.Apellidos = data.Persona.Apellidos;
             }
-            if (data.persona.email != null)
+            if (data.Persona.Email != null)
             {
-                p.Email = data.persona.email;
+                p.Email = data.Persona.Email;
             }
-            if (data.persona.telefono != null)
+            if (data.Persona.Telefono != null)
             {
-                p.Telefono = data.persona.telefono;
+                p.Telefono = data.Persona.Telefono;
             }
-            if (data.persona.direccion != null)
+            if (data.Persona.Direccion != null)
             {
-                p.Direccion = data.persona.direccion;
+                p.Direccion = data.Persona.Direccion;
             }
-            if (data.persona.comuna != null)
+            if (data.Persona.Comuna != null)
             {
-                p.Comuna = data.persona.comuna;
+                p.Comuna = data.Persona.Comuna;
             }
-            if (data.persona.region != null)
+            if (data.Persona.Region != null)
             {
-                p.Region = data.persona.region;
+                p.Region = data.Persona.Region;
             }
-            if (data.persona.id_genero != null)
+            if (data.Persona.Id_genero != null)
             {
-                p.Id_genero = data.persona.id_genero;
+                p.Id_genero = data.Persona.Id_genero;
             }
             if (await cmd.Update(p))
             {
