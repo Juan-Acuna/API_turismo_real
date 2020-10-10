@@ -92,8 +92,8 @@ namespace API_TurismoReal.Controllers
             return BadRequest();
         }
         [Authorize(Roles = "1")]
-        [HttpPatch]
-        public async Task<IActionResult> Patch([FromBody]Chofer chofer)
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> Patch([FromRoute]int id, [FromBody]dynamic data)
         {
             if (!ConexionOracle.Activa)
             {
@@ -103,7 +103,42 @@ namespace API_TurismoReal.Controllers
                     return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
-            if (await cmd.Update(chofer))
+            Chofer c = await cmd.Get<Chofer>(id);
+            Persona p = await cmd.Get<Persona>(c.Rut);
+
+            if (data.persona.nombres != null)
+            {
+                p.Nombres = data.persona.nombres;
+            }
+            if (data.persona.apellidos != null)
+            {
+                p.Apellidos = data.persona.apellidos;
+            }
+            if (data.persona.email != null)
+            {
+                p.Email = data.persona.email;
+            }
+            if (data.persona.telefono != null)
+            {
+                p.Telefono = data.persona.telefono;
+            }
+            if (data.persona.direccion != null)
+            {
+                p.Direccion = data.persona.direccion;
+            }
+            if (data.persona.comuna != null)
+            {
+                p.Comuna = data.persona.comuna;
+            }
+            if (data.persona.region != null)
+            {
+                p.Region = data.persona.region;
+            }
+            if (data.persona.id_genero != null)
+            {
+                p.Id_genero = data.persona.id_genero;
+            }
+            if (await cmd.Update(p))
             {
                 return Ok();
             }

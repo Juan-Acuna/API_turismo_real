@@ -81,6 +81,7 @@ namespace API_TurismoReal.Controllers
             {
                 foreach(var u in usuarios)
                 {
+                    u.Clave = "";
                     Persona p = await cmd.Get<Persona>(u.Rut);
                     if (p != null)
                     {
@@ -106,6 +107,7 @@ namespace API_TurismoReal.Controllers
             Usuario u = await cmd.Get<Usuario>(username);
             if ( u != null)
             {
+                u.Clave = "";
                 Persona p = await cmd.Get<Persona>(u.Rut);
                 if(p != null)
                 {
@@ -117,7 +119,7 @@ namespace API_TurismoReal.Controllers
 
         
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody]PersonaUsuario creador)
+        public async Task<IActionResult> Post([FromBody]PersonaUsuario creador,[FromHeader(Name = "User-Agent")]String userAgent)
         {
             if (!ConexionOracle.Activa)
             {
@@ -129,6 +131,10 @@ namespace API_TurismoReal.Controllers
             }
             Usuario usuario = creador.Usuario;
             Persona persona = creador.Persona;
+            if (!userAgent.Equals("TurismoRealDesktop"))
+            {
+                usuario.Id_rol = 5;
+            }
             usuario.Activo = '1';
             usuario.Frecuente = '0';
             usuario.Rut = persona.Rut;
@@ -156,57 +162,60 @@ namespace API_TurismoReal.Controllers
             }
             Usuario u = await cmd.Get<Usuario>(username);
             Persona p = await cmd.Get<Persona>(u.Rut);
-            if (data.clave != null)
+            if (data.usuario.clave != null)
             {
-                u.Clave = data.clave;
+                u.Clave = data.usuario.clave;
             }
-            if (data.id_rol != null)
+            if (data.usuario.id_rol != null)
             {
-                u.Id_rol = data.id_rol;
+                u.Id_rol = data.usuario.id_rol;
             }
-            if (data.activo != null)
+            if (data.usuario.activo != null)
             {
-                u.Activo = data.activo;
+                u.Activo = data.usuario.activo;
             }
-            if (data.frecuente != null)
+            if (data.usuario.frecuente != null)
             {
-                u.Frecuente = data.frecuente;
+                u.Frecuente = data.usuario.frecuente;
             }
-            if (data.nombres != null)
+            if (data.persona.nombres != null)
             {
-                p.Nombres = data.nombres;
+                p.Nombres = data.persona.nombres;
             }
-            if (data.apellidos != null)
+            if (data.persona.apellidos != null)
             {
-                p.Apellidos = data.apellidos;
+                p.Apellidos = data.persona.apellidos;
             }
-            if (data.email != null)
+            if (data.persona.email != null)
             {
-                p.Email = data.email;
+                p.Email = data.persona.email;
             }
-            if (data.telefono != null)
+            if (data.persona.telefono != null)
             {
-                p.Telefono = data.telefono;
+                p.Telefono = data.persona.telefono;
             }
-            if (data.direccion != null)
+            if (data.persona.direccion != null)
             {
-                p.Direccion = data.direccion;
+                p.Direccion = data.persona.direccion;
             }
-            if (data.comuna != null)
+            if (data.persona.comuna != null)
             {
-                p.Comuna = data.comuna;
+                p.Comuna = data.persona.comuna;
             }
-            if (data.region != null)
+            if (data.persona.region != null)
             {
-                p.Region = data.region;
+                p.Region = data.persona.region;
             }
-            if (data.id_genero != null)
+            if (data.persona.id_genero != null)
             {
-                p.Id_genero = data.id_genero;
+                p.Id_genero = data.persona.id_genero;
             }
             if (await cmd.Update(u))
             {
-                return Ok();
+                if(await cmd.Update(p))
+                {
+                    return Ok();
+                }
             }
             return BadRequest();
         }
