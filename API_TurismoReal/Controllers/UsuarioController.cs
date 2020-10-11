@@ -51,7 +51,7 @@ namespace API_TurismoReal.Controllers
                         return BadRequest(new { error = "Contraseña incorrecta." });
                     case 2://Inicio exitoso.
                         usuario = await cmd.Get<Usuario>(usuario.Username);
-                        Persona p = await cmd.Get<Persona>(usuario.Rut);
+                        Persona persona = await cmd.Get<Persona>(usuario.Rut);
                         if (userAgent.Equals("TurismoRealDesktop"))
                         {
                             if (usuario.Id_rol > 1)
@@ -59,7 +59,7 @@ namespace API_TurismoReal.Controllers
                                 return StatusCode(401, new { Error="Acceso Denegado."});
                             }
                         }
-                        return Ok(Tools.GenerarToken(usuario,p));
+                        return Ok(Tools.GenerarToken(usuario,persona));
                     default:
                         return StatusCode(502);
                 }
@@ -151,7 +151,7 @@ namespace API_TurismoReal.Controllers
             {
                 if (await cmd.Insert(usuario, false))
                 {
-                    return Ok(Tools.GenerarToken(usuario));
+                    return Ok(Tools.GenerarToken(usuario,persona));
                 }
             }
             return BadRequest();
