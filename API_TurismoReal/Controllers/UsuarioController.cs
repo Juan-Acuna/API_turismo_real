@@ -172,7 +172,7 @@ namespace API_TurismoReal.Controllers
             Persona p = await cmd.Get<Persona>(u.Rut);
             if (data.Usuario.Clave != null)
             {
-                u.Clave = Tools.Encriptar(data.Usuario.Clave);
+                u.Clave = Tools.Encriptar((String)data.Usuario.Clave);
             }
             if (data.Usuario.Id_rol != null)
             {
