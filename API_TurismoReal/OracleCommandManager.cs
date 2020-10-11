@@ -474,7 +474,7 @@ namespace Conection
             s = ((char)(s[0] - 32)).ToString() + s.Remove(0, 1);
             return s;
         }
-        public static Token GenerarToken(Usuario usuario)
+        public static Token GenerarToken(Usuario usuario,Persona persona)
         {
             var claims = new[]
             {
@@ -493,7 +493,7 @@ namespace Conection
                claims: claims,
                expires: expiration,
                signingCredentials: creds);
-            return new Token(new JwtSecurityTokenHandler().WriteToken(token), expiration);
+            return new Token(new JwtSecurityTokenHandler().WriteToken(token), expiration,usuario.Username,persona.Nombres,persona.Apellidos);
         }
 
         public static string Encriptar(String texto)
@@ -507,11 +507,17 @@ namespace Conection
     {
         public String token { get; set; }
         public DateTime expiration { get; set; }
+        public String nombres { get; set; }
+        public String apellidos { get; set; }
+        public String username { get; set; }
 
-        public Token(String token, DateTime expiration)
+        public Token(String token, DateTime expiration,String username, String nombres, String apellidos)
         {
             this.token = token;
             this.expiration = expiration;
+            this.username = username;
+            this.apellidos = apellidos;
+            this.nombres = nombres;
         }
     }
     public class ResponseJson

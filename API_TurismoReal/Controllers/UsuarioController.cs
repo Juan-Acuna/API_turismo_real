@@ -21,7 +21,7 @@ namespace API_TurismoReal.Controllers
     {
         OracleCommandManager cmd = new OracleCommandManager(ConexionOracle.Conexion);
         [HttpPost("autenticar")]
-        public async Task<IActionResult> Auth([FromBody] Usuario usuario)
+        public async Task<IActionResult> Auth([FromHeader(Name = "User-Agent")]String userAgent, [FromBody] Usuario usuario)
         {
             if (!ConexionOracle.Activa)
             {
@@ -50,8 +50,16 @@ namespace API_TurismoReal.Controllers
                     case 1://Contraseña incorrecta.
                         return BadRequest(new { error = "Contraseña incorrecta." });
                     case 2://Inicio exitoso.
-                        usuario.Id_rol = Convert.ToInt32((decimal)(OracleDecimal)(p.Parametros["rol"].Value));
-                        return Ok(Tools.GenerarToken(usuario));
+                        usuario = await cmd.Get<Usuario>(usuario.Username);
+                        Persona p = await cmd.Get<Persona>(usuario.Rut);
+                        if (userAgent.Equals("TurismoRealDesktop"))
+                        {
+                            if (usuario.Id_rol > 1)
+                            {
+                                return StatusCode(401, new { Error="Acceso Denegado."});
+                            }
+                        }
+                        return Ok(Tools.GenerarToken(usuario,p));
                     default:
                         return StatusCode(502);
                 }
