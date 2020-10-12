@@ -25,7 +25,7 @@ namespace API_TurismoReal.Conexiones
         static String MBaja = "";
         static String AMulta = "Usted ha sido multado.";
         static String MMulta = "VALE POR UNA NOTIFICACION DE MULTA";
-        static String AActivar = "";
+        static String AActivar = "Activacion de cuenta de {rol} en Turismo Real.";
         static String MActivar = "";
 
         MensajeCorreo recuperarClave = new MensajeCorreo(ClienteSmtp.DireccionEmail,ARecuperarClave, MRecuperarClave);

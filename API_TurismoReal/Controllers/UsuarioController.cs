@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
+using API_TurismoReal.Conexiones;
 using Conection;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,6 +18,7 @@ namespace API_TurismoReal.Controllers
     [Produces("application/json")]
     public class UsuarioController : ControllerBase
     {
+        MensajesEstandar Mensajes = MensajesEstandar.Instancia;
         OracleCommandManager cmd = new OracleCommandManager(ConexionOracle.Conexion);
         [HttpPost("autenticar")]
         public async Task<IActionResult> Auth([FromHeader(Name = "User-Agent")]String userAgent, [FromBody] Usuario usuario)
@@ -145,11 +147,38 @@ namespace API_TurismoReal.Controllers
             usuario.Frecuente = '0';
             usuario.Rut = persona.Rut;
             usuario.Clave = Tools.Encriptar(usuario.Clave);
-            if (await cmd.Insert(persona,false))
+            if (userAgent.Equals("TurismoRealDesktop"))
+            {
+                usuario.Clave = Tools.Encriptar(Tools.CodigoAleatorio(usuario.Username));
+                var reset = new ClaveReset
+                {
+                    Codigo = Tools.CodigoAleatorio(persona.Rut),
+                    Fecha = DateTime.Now,
+                    Vencimiento = DateTime.Now.AddMonths(1),
+                    Canjeado = '0',
+                    Username=usuario.Username
+                };
+                if(await cmd.Insert(reset))
+                {
+                    if(await cmd.Insert(persona, false))
+                    {
+                        if (await cmd.Insert(usuario, false))
+                        {
+                            var m = Mensajes.ActivacionCuenta;
+                            m.AgregarDestinatario(persona.Email, persona.Nombres + " " + persona.Apellidos);
+                            ClienteSmtp.Enviar(m);
+                            return Ok();
+                        }
+                        await cmd.Delete(usuario);
+                    }
+                    await cmd.Delete(persona);
+                }
+            }
+            else if(await cmd.Insert(persona, false))
             {
                 if (await cmd.Insert(usuario, false))
                 {
-                    return Ok(Tools.GenerarToken(usuario,persona));
+                    return Ok(Tools.GenerarToken(usuario, persona));
                 }
             }
             return BadRequest();

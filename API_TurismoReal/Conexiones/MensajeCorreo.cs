@@ -46,5 +46,13 @@ namespace API_TurismoReal.Conexiones
             }
             this.Para = new MailAddress(correo, nombre);
         }
+        public void ConfigurarMensaje(String item, String valor)
+        {
+            this.Contenido.Replace(item,valor);
+        }
+        public void ConfigurarAsunto(String item, String valor)
+        {
+            this.Asunto.Replace(item, valor);
+        }
     }
 }

@@ -502,6 +502,26 @@ namespace Conection
                 .GetString(new SHA1CryptoServiceProvider()
                 .ComputeHash(Encoding.ASCII.GetBytes(texto)));
         }
+        public static String CodigoAleatorio(String rut)
+        {
+            String clave = "";
+            int suma = DateTime.Now.Millisecond;
+            foreach (var c in rut)
+            {
+                suma += c;
+            }
+            var r = new Random(suma);
+            for (int i = 0; i < 10; i++)
+            {
+                int l = 65 + r.Next(57);
+                if (l >= 91 && l <= 96)
+                {
+                    l = 95;
+                }
+                clave += (char)l;
+            }
+            return clave;
+        }
     }
     public class Token
     {

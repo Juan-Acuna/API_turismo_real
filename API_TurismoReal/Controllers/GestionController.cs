@@ -22,7 +22,7 @@ namespace API_TurismoReal.Controllers
         public async Task<IActionResult> EnviarCorreo([FromRoute]String correo)
         {//ESTE METODO ESTA CONFIGURADO PARA SER DE PRUEBAS, CORREGIR MAS ADELANTE
             var m = Mensajes.NotificarMulta;
-            m.AgregarDestinatario(correo,CodigoAleatorio("19915954-2"));
+            m.AgregarDestinatario(correo);
             var r = ClienteSmtp.Enviar(m);
             return Ok(new { Correo = correo, Resultado = r});
         }
@@ -34,7 +34,7 @@ namespace API_TurismoReal.Controllers
             String username="";
             var u = await cmd.Get<Usuario>(username);
             var p = await cmd.Get<Persona>(u.Rut);
-            u.Clave = CodigoAleatorio(username);
+            u.Clave = Tools.CodigoAleatorio(username);
             await cmd.Update(u);
             var m = Mensajes.RecuperarClave;
             m.AgregarDestinatario(p.Email,p.Nombres.Split(' ')[0]+" "+p.Apellidos.Split(' ')[0]);
@@ -42,34 +42,14 @@ namespace API_TurismoReal.Controllers
             return Ok();
         }
 
-        [HttpPost("nuevaclave")]
-        public async Task<IActionResult> NuevaClave([FromBody]String username)
+        [HttpPost("nuevacuenta")]
+        public async Task<IActionResult> NuevaClave([FromBody]dynamic data)
         {
+            String username = data.Username;
             var u = await cmd.Get<Usuario>(username);
-            u.Clave = CodigoAleatorio(username);
+            u.Clave = Tools.CodigoAleatorio(username);
             await cmd.Update(u);
             return Ok();
-        }
-
-        private String CodigoAleatorio(String rut)
-        {
-            String clave = "";
-            int suma = DateTime.Now.Millisecond;
-            foreach(var c in rut)
-            {
-                suma += c;
-            }
-            var r = new Random(suma);
-            for(int i=0;i<10;i++)
-            {
-                int l = 65 + r.Next(57);
-                if(l >= 91 && l <= 96)
-                {
-                    l = 95;
-                }
-                clave += (char)l;
-            }
-            return clave;
         }
     }
 }

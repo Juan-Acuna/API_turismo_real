@@ -32,6 +32,7 @@ namespace API_TurismoReal
                 MailMessage msg = new MailMessage(mensaje.De, mensaje.Para);
                 msg.Subject = mensaje.Asunto;
                 msg.Body = mensaje.Contenido;
+                msg.IsBodyHtml = true;
                 smtp.Send(msg);
                 return new { Entrada = mensaje, Salida = msg };
             }
