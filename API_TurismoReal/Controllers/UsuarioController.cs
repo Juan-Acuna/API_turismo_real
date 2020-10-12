@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using System.Threading.Tasks;
 using Conection;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models;
 using Oracle.ManagedDataAccess.Client;
@@ -170,7 +168,7 @@ namespace API_TurismoReal.Controllers
             }
             Usuario u = await cmd.Get<Usuario>(username);
             Persona p = await cmd.Get<Persona>(u.Rut);
-            if (data.Usuario.Clave != null)
+            if (data.Usuario.Clave != null || ((String)data.Usuario.Clave).Trim().Length>0)
             {
                 u.Clave = Tools.Encriptar((String)data.Usuario.Clave);
             }
@@ -181,10 +179,6 @@ namespace API_TurismoReal.Controllers
             if (data.Usuario.Activo != null)
             {
                 u.Activo = data.Usuario.Activo;
-            }
-            if (data.Usuario.Frecuente != null)
-            {
-                u.Frecuente = data.Usuario.Frecuente;
             }
             if (data.Persona.Nombres != null)
             {
