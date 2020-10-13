@@ -286,8 +286,70 @@ namespace Conection
                 return false;
             }
         }
+        public async Task<List<T>> Find<T>(String field, dynamic value) where T : class, new()
+        {
+            FormatearComando();
+            String tabla = typeof(T).Name;
+            String condicion = FormatId(field, value, value is String);
+            buscar = buscar.Replace("VALORES", "*");
+            buscar = buscar.Replace("TABLA", tabla);
+            buscar = buscar.Replace("CONDICION", condicion);
+            Console.WriteLine(buscar);
+            try
+            {
+                _select = new OracleCommand(buscar, con);
+                _select.CommandType = CommandType.Text;
+                OracleDataReader dReader = _select.ExecuteReader();
+                OracleDataReader dr = (OracleDataReader)await _select.ExecuteReaderAsync();
+                int cuentaObjetos = 0;
+                while (dr.Read())
+                {
+                    cuentaObjetos++;
+                }
+                dr.Close();
+                List<T> lista = new List<T>();
+                Object[][] obj = new Object[cuentaObjetos][];
+                int l = 0;
+                while (dReader.Read())
+                {
+                    obj[l] = new Object[typeof(T).GetProperties().Length];
+                    for (int j = 0; j < typeof(T).GetProperties().Length; j++)
+                    {
+                        obj[l][j] = dReader.GetValue(j);
+                    }
+                    l++;
+                }
+                dReader.Close();
+                T t;
+                var m = typeof(T).GetProperties();
+                foreach (var ob in obj)
+                {
+                    l = 0;
+                    t = new T();
+                    foreach (var item in m)
+                    {
+                        try
+                        {
+                            item.SetValue(t, obj[l]);
+                        }
+                        catch (ArgumentException e)
+                        {
+                            item.SetValue(t, Convert.ToChar(obj[l]));
+                        }
+                        l++;
+                    }
+                    lista.Add(t);
+                }
+                return lista;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return null;
+            }
+        }
         #endregion
-       
+
 
         private void FormatearComando()
         {

@@ -137,51 +137,80 @@ namespace API_TurismoReal.Controllers
                     return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
-            Usuario usuario = creador.Usuario;
-            Persona persona = creador.Persona;
-            if (!userAgent.Equals("TurismoRealDesktop"))
+            try
             {
-                usuario.Id_rol = 5;
-            }
-            usuario.Activo = '1';
-            usuario.Frecuente = '0';
-            usuario.Rut = persona.Rut;
-            usuario.Clave = Tools.Encriptar(usuario.Clave);
-            if (userAgent.Equals("TurismoRealDesktop"))
-            {
-                usuario.Clave = Tools.Encriptar(Tools.CodigoAleatorio(usuario.Username));
-                var reset = new ClaveReset
+                Usuario usuario = creador.Usuario;
+                Persona persona = creador.Persona;
+                if (!userAgent.Equals("TurismoRealDesktop"))
                 {
-                    Codigo = Tools.CodigoAleatorio(persona.Rut),
-                    Fecha = DateTime.Now,
-                    Vencimiento = DateTime.Now.AddMonths(1),
-                    Canjeado = '0',
-                    Username=usuario.Username
-                };
-                if(await cmd.Insert(reset))
+                    usuario.Id_rol = 5;
+                    usuario.Clave = Tools.Encriptar(usuario.Clave);
+                }
+                else
                 {
-                    if(await cmd.Insert(persona, false))
+                    usuario.Clave = Tools.Encriptar(Tools.CodigoAleatorio(persona.Rut));
+                }
+                usuario.Activo = '1';
+                usuario.Frecuente = '0';
+                usuario.Rut = persona.Rut;
+                if (userAgent.Equals("TurismoRealDesktop"))
+                {
+                    usuario.Activo = '0';
+                    usuario.Clave = Tools.Encriptar(Tools.CodigoAleatorio(usuario.Username));
+                    var reset = new ClaveReset
                     {
-                        if (await cmd.Insert(usuario, false))
+                        Codigo = Tools.CodigoAleatorio(persona.Rut),
+                        Fecha = DateTime.Now,
+                        Vencimiento = DateTime.Now.AddMonths(1),
+                        Canjeado = '0',
+                        Username = usuario.Username
+                    };
+                    if (await cmd.Insert(reset))
+                    {
+                        if (await cmd.Insert(persona, false))
                         {
-                            var m = Mensajes.ActivacionCuenta;
-                            m.AgregarDestinatario(persona.Email, persona.Nombres + " " + persona.Apellidos);
-                            ClienteSmtp.Enviar(m);
-                            return Ok();
+                            if (await cmd.Insert(usuario, false))
+                            {
+                                var rol = await cmd.Get<Rol>(usuario.Id_rol);
+                                String salt = Tools.Encriptar(usuario.Username + reset.Codigo);
+                                var m = Mensajes.ActivacionCuenta;
+                                m.AgregarDestinatario(persona.Email, persona.Nombres + " " + persona.Apellidos);
+                                m.ConfigurarAsunto("rol", rol.Nombre);
+                                m.ConfigurarMensaje("rol", rol.Nombre);
+                                m.ConfigurarMensaje("usuario", usuario.Username);
+                                m.ConfigurarMensaje("codigo", reset.Codigo);
+                                m.ConfigurarMensaje("salt", salt);
+                                ClienteSmtp.Enviar(m);
+                                return Ok();
+                            }
+                            await cmd.Delete(usuario);
                         }
-                        await cmd.Delete(usuario);
+                        await cmd.Delete(persona);
+                    }
+                }
+                else if (await cmd.Insert(persona, false))
+                {
+                    if (await cmd.Insert(usuario, false))
+                    {
+                        return Ok(Tools.GenerarToken(usuario, persona));
                     }
                     await cmd.Delete(persona);
                 }
+                return BadRequest();
             }
-            else if(await cmd.Insert(persona, false))
+            catch (Exception e)
             {
-                if (await cmd.Insert(usuario, false))
+                var a = new
                 {
-                    return Ok(Tools.GenerarToken(usuario, persona));
-                }
+                    Error= new
+                    {
+                        Mensaje = e.Message,
+                        Inner = e.InnerException,
+                        Fuente = e.Source
+                    }
+                };
+                return StatusCode(400, a);
             }
-            return BadRequest();
         }
         [Authorize]
         [HttpPatch("{username}")]

@@ -48,11 +48,11 @@ namespace API_TurismoReal.Conexiones
         }
         public void ConfigurarMensaje(String item, String valor)
         {
-            this.Contenido.Replace(item,valor);
+            this.Contenido = Contenido.Replace("{" + item + "}",valor);
         }
         public void ConfigurarAsunto(String item, String valor)
         {
-            this.Asunto.Replace(item, valor);
+            this.Asunto = Asunto.Replace("{" + item + "}", valor);
         }
     }
 }
