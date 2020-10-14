@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Conection;
+using API_TurismoReal.Conexiones;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Models;
+using API_TurismoReal.Models;
 
 namespace API_TurismoReal.Controllers
 {
@@ -42,11 +42,11 @@ namespace API_TurismoReal.Controllers
             }
             return Ok(new { Disponible = d });
         }
-        [HttpGet("disponible/rut/{email}")]
+        [HttpGet("disponible/email/{email}")]
         public async Task<IActionResult> EmailDisponible([FromRoute]String email)
         {
             bool d = true;
-            var u = await cmd.Get<Persona>(email);
+            var u = await cmd.Find<Persona>("email",email);
             if (u != null)
             {
                 d = false;

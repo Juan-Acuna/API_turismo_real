@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System;
 
-namespace Models
+namespace API_TurismoReal.Models
 {
     public class EstadoAsignacion
     {
-        public int Id_estado { get; set; }
+        public int Id_estado { get; set; } //PRIMARY KEY
         public String Nombre { get; set; }
     }
 }

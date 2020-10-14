@@ -4,14 +4,14 @@ using Oracle.ManagedDataAccess.Client;
 using System.Data;
 using System.Reflection;
 using System.Threading.Tasks;
-using Models;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using API_TurismoReal.Models;
 
-namespace Conection
+namespace API_TurismoReal.Conexiones
 {
     /// <summary>
     /// Una simple clase en C# que a traves de una conexión OracleConection permite ejecutar un CRUD completo.

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace API_TurismoReal
+namespace API_TurismoReal.Conexiones
 {
     public class ConexionOracle
     {

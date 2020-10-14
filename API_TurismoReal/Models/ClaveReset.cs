@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System;
 
-namespace Models
+namespace API_TurismoReal.Models
 {
     public class ClaveReset
     {
-        public int Id_reset { get; set; }
+        public int Id_reset { get; set; } //PRIMARY KEY
         public String Codigo { get; set; }
         public DateTime Fecha { get; set; }
         public DateTime Vencimiento { get; set; }

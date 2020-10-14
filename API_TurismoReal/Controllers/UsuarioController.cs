@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
 using API_TurismoReal.Conexiones;
-using Conection;
+using API_TurismoReal.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Models;
 using Oracle.ManagedDataAccess.Client;
 using Oracle.ManagedDataAccess.Types;
 

@@ -1,12 +1,11 @@
-﻿using API_TurismoReal.Conexiones;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Mail;
 using System.Threading.Tasks;
 
-namespace API_TurismoReal
+namespace API_TurismoReal.Conexiones
 {
     public static class ClienteSmtp
     {

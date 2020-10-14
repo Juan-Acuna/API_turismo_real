@@ -1,6 +1,6 @@
 using System;
 
-namespace Models
+namespace API_TurismoReal.Models
 {
     public class Articulo
     {

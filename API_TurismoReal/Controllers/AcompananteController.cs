@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Conection;
+using API_TurismoReal.Conexiones;
+using API_TurismoReal.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Models;
 
 namespace API_TurismoReal.Controllers
 {

@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using API_TurismoReal.Conexiones;
-using Conection;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Models;
+using API_TurismoReal.Models;
 
 namespace API_TurismoReal.Controllers
 {
