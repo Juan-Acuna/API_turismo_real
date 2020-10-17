@@ -9,7 +9,7 @@ namespace API_TurismoReal.Models
         public String Apellidos { get; set; }
         public DateTime Nacimiento { get; set; }
         public String Email { get; set; }
-        public int Telefono { get; set; }
+        public long Telefono { get; set; }
         public String Direccion { get; set; }
         public String Comuna { get; set; }
         public String Region { get; set; }

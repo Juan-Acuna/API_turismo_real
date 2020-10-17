@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using API_TurismoReal.Conexiones;
@@ -7,6 +9,8 @@ using API_TurismoReal.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Oracle.ManagedDataAccess.Client;
+using Oracle.ManagedDataAccess.Types;
 
 namespace API_TurismoReal.Controllers
 {
@@ -53,8 +57,8 @@ namespace API_TurismoReal.Controllers
             return BadRequest();
         }
         [Authorize(Roles = "1")]
-        [HttpPost]
-        public async Task<IActionResult> Post([FromBody]Foto f)
+        [HttpPost("{id_depto}")]
+        public async Task<IActionResult> Post([FromForm]List<IFormFile> imagenes,[FromRoute]int id_depto)
         {
             if (!ConexionOracle.Activa)
             {
@@ -64,15 +68,68 @@ namespace API_TurismoReal.Controllers
                     return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
-            if (await cmd.Insert(f))
+            Departamento depto = await cmd.Get<Departamento>(id_depto);
+            Localidad localidad = await cmd.Get<Localidad>(depto.Id_localidad);
+            List<Foto> listaFotos = new List<Foto>();
+            Foto f;
+            Procedimiento p = new Procedimiento(ConexionOracle.Conexion,"SP_ID_FOTO");
+            p.Parametros.Add("id_depto", OracleDbType.Int32, ParameterDirection.Output);
+            String rutaBase = "D:\\HostingSpaces\\unusuario256\\turismoreal.xyz\\public_html\\wwwroot\\";
+            try
             {
-                return Ok();
+                if (imagenes.Count > 0)
+                {
+                    foreach (var foto in imagenes)
+                    {
+                        await p.Ejecutar();
+                        int idf = Convert.ToInt32((decimal)(OracleDecimal)(p.Parametros["id_depto"].Value));
+                        String subruta = "img\\" + Tools.ToUrlCompatible(localidad.Nombre.ToLower()) + "\\" + Tools.ToUrlCompatible(depto.Nombre.ToLower()) + "\\" + Tools.ToUrlCompatible(depto.Nombre.ToUpper().Replace(" ", "_")) + "_" + idf.ToString() + Path.GetExtension(foto.FileName);
+                        using (var stream = System.IO.File.Create(rutaBase + subruta))
+                        {
+                            await foto.CopyToAsync(stream);
+                        }
+                        f = new Foto
+                        {
+                            Id_foto = idf,
+                            Ruta = ("http://turismoreal.xyz/" + subruta).Replace("\\","/"),
+                            Id_depto = depto.Id_depto
+                        };
+                        listaFotos.Add(f);
+                    }
+                    int cont = 0;
+                    foreach (var item in listaFotos)
+                    {
+                        if (await cmd.Insert(item,false))
+                        {
+                            cont++;
+                        }
+                    }
+                    if (cont == 1)
+                    {
+                        return Ok(new { Mensaje = "La Imagen fue subida exitosamente." });
+                    }
+                    else if (cont > 0)
+                    {
+                        return Ok(new { Mensaje = cont.ToString() + " Imagenes fueron subidas exitosamente." });
+                    }
+                    else
+                    {
+                        return BadRequest(new { Error = "No fue posible subir la(s) imagen(es)." });
+                    }
+                }
+                else
+                {
+                    return BadRequest(new { Error = "No se recibieron imagenes." });
+                }
             }
-            return BadRequest();
+            catch (Exception e)
+            {
+                return StatusCode(500, new { Error = e.Message });
+            }
         }
         [Authorize(Roles = "1")]
         [HttpPatch]
-        public async Task<IActionResult> Patch([FromBody]Foto f)
+        public async Task<IActionResult> Patch([FromForm]List<IFormFile> imagenes)
         {
             if (!ConexionOracle.Activa)
             {
@@ -82,11 +139,13 @@ namespace API_TurismoReal.Controllers
                     return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
-            if (await cmd.Update(f))
+            List<String> l = new List<string>();
+            foreach(var imagen in imagenes)
             {
-                return Ok();
+                l.Add(imagen.FileName);
             }
-            return BadRequest();
+            return Ok(l);
+            //return BadRequest();
         }
         [Authorize(Roles = "1")]
         [HttpDelete]

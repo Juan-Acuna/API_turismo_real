@@ -158,7 +158,7 @@ namespace API_TurismoReal.Controllers
                     usuario.Clave = Tools.Encriptar(Tools.CodigoAleatorio(usuario.Username));
                     var reset = new ClaveReset
                     {
-                        Codigo = Tools.CodigoAleatorio(persona.Rut),
+                        Codigo = Tools.CodigoAleatorio(persona.Rut,20),
                         Fecha = DateTime.Now,
                         Vencimiento = DateTime.Now.AddMonths(1),
                         Canjeado = '0',
@@ -171,7 +171,7 @@ namespace API_TurismoReal.Controllers
                             if (await cmd.Insert(usuario, false))
                             {
                                 var rol = await cmd.Get<Rol>(usuario.Id_rol);
-                                String salt = Tools.Encriptar(usuario.Username + reset.Codigo);
+                                String salt = Tools.EncriptarUrlCompatible(usuario.Username + reset.Codigo);
                                 var m = Mensajes.ActivacionCuenta;
                                 m.AgregarDestinatario(persona.Email, persona.Nombres + " " + persona.Apellidos);
                                 m.ConfigurarAsunto("rol", rol.Nombre);

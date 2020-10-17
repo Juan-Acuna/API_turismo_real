@@ -95,7 +95,6 @@ namespace API_TurismoReal.Conexiones
                 _select.Parameters.Add("valores", OracleDbType.Varchar2, val, ParameterDirection.Input);
                 _select.Parameters.Add("condicion", OracleDbType.Varchar2, condicion, ParameterDirection.Input);
                 _select.Parameters.Add("retorno", OracleDbType.RefCursor, ParameterDirection.Output);
-                var query = "SELECT "+val+" FROM "+tabla+" WHERE "+condicion;
                 OracleDataReader dReader = (OracleDataReader)await _select.ExecuteReaderAsync();
                 Object[] obj = new Object[typeof(T).GetProperties().Length];
                 while (dReader.Read())
@@ -121,8 +120,16 @@ namespace API_TurismoReal.Conexiones
                         }
                         catch (ArgumentException e)
                         {
-                            item.SetValue(t, Convert.ToChar(obj[l]));
-                            l++;
+                            try
+                            {
+                                item.SetValue(t, Convert.ToChar(obj[l]));
+                                l++;
+                            }
+                            catch(OverflowException ex)
+                            {
+                                item.SetValue(t, Convert.ToInt32(obj[l]));
+                                l++;
+                            }
                         }
                     }
                     return t;
@@ -151,7 +158,7 @@ namespace API_TurismoReal.Conexiones
             {
                 _select = new OracleCommand(buscar, con);
                 _select.CommandType = CommandType.Text;
-                OracleDataReader dReader = _select.ExecuteReader();
+                OracleDataReader dReader = (OracleDataReader)await _select.ExecuteReaderAsync();
                 OracleDataReader dr = (OracleDataReader)await _select.ExecuteReaderAsync();
                 int cuentaObjetos = 0;
                 while (dr.Read())
@@ -286,7 +293,7 @@ namespace API_TurismoReal.Conexiones
                 return false;
             }
         }
-        public async Task<List<T>> Find<T>(String field, dynamic value) where T : class, new()
+        public async Task<List<T>> Find<T>(String field, object value) where T : class, new()
         {
             FormatearComando();
             String tabla = typeof(T).Name;
@@ -299,7 +306,7 @@ namespace API_TurismoReal.Conexiones
             {
                 _select = new OracleCommand(buscar, con);
                 _select.CommandType = CommandType.Text;
-                OracleDataReader dReader = _select.ExecuteReader();
+                OracleDataReader dReader = (OracleDataReader)await _select.ExecuteReaderAsync();
                 OracleDataReader dr = (OracleDataReader)await _select.ExecuteReaderAsync();
                 int cuentaObjetos = 0;
                 while (dr.Read())
@@ -330,11 +337,20 @@ namespace API_TurismoReal.Conexiones
                     {
                         try
                         {
-                            item.SetValue(t, obj[l]);
+                            item.SetValue(t, ob[l]);
                         }
                         catch (ArgumentException e)
                         {
-                            item.SetValue(t, Convert.ToChar(obj[l]));
+                            try
+                            {
+                                Char c = Char.Parse((String)ob[l]);
+                                item.SetValue(t, c);
+                            }
+                            catch (ArgumentException ex)
+                            {
+                                bool b = ((String)ob[l]).Equals("1");
+                                item.SetValue(t, b);
+                            }
                         }
                         l++;
                     }
@@ -450,139 +466,6 @@ namespace API_TurismoReal.Conexiones
             {
                 return field + "=" + idValue.ToString();
             }
-        }
-    }
-    public static class Tools
-    {
-        
-        public static DateTime StringToDate(String date,DateFormat format = DateFormat.DayMonthYear)
-        {
-            String d = "";
-            String y = "";
-            String m = "";
-            date = date.Replace("/","");
-            date = date.Replace("-", "");
-            switch (format)
-            {
-                case DateFormat.DayMonthYear:
-                    d = date.Substring(0,2);
-                    m = date.Substring(2,2);
-                    y = date.Substring(4,4);
-                    break;
-                case DateFormat.MonthDayYear:
-                    m = date.Substring(0, 2);
-                    d = date.Substring(2, 2);
-                    y = date.Substring(4, 4);
-                    break;
-                case DateFormat.YearMonthDay:
-                    y = date.Substring(0, 4);
-                    m = date.Substring(4, 2);
-                    d = date.Substring(6, 2);
-                    break;
-            }
-            return new DateTime(Int32.Parse(y), Int32.Parse(m), Int32.Parse(d));
-        }
-        public static String DateToString(DateTime date, DateFormat outputFormat, char divisor = '/')
-        {
-            String output = "";
-            String d;
-            String y;
-            String m;
-            if(date.Day < 10)
-            {
-                d = "0" + date.Day.ToString();
-            }
-            else
-            {
-                d = date.Day.ToString();
-            }
-            if (date.Month < 10)
-            {
-                m = "0" + date.Month.ToString();
-            }
-            else
-            {
-                m = date.Month.ToString();
-            }
-            y = date.Year.ToString();
-            switch (outputFormat)
-            {
-                case DateFormat.DayMonthYear:
-                    output = d + divisor + m + divisor + y;
-                    break;
-                case DateFormat.MonthDayYear:
-                    output = m + divisor + d + divisor + y;
-                    break;
-                case DateFormat.YearMonthDay:
-                    output = y + divisor + m + divisor + d;
-                    break;
-            }
-            return output;
-        }
-        public static String Capitalize(String str)
-        {
-            String s = "";
-            foreach (var l in str)
-            {
-                if (l >= 65 && l <= 90)
-                {
-                    s += ((char)(l + 32)).ToString();
-                }
-                else
-                {
-                    s += l.ToString();
-                }
-            }
-            s = ((char)(s[0] - 32)).ToString() + s.Remove(0, 1);
-            return s;
-        }
-        public static Token GenerarToken(Usuario usuario,Persona persona)
-        {
-            var claims = new[]
-            {
-                new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),
-                new Claim(JwtRegisteredClaimNames.UniqueName, usuario.Username),
-                new Claim(ClaimsIdentity.DefaultRoleClaimType,usuario.Id_rol.ToString())
-            };
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("kdljsfksdda234jf654dkgfHGDjsfkFglDSAGFshgfdHgdHGdfjhgfjT$#tsj&iJStrhfhk"));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            var expiration = DateTime.UtcNow.AddHours(1);
-
-            JwtSecurityToken token = new JwtSecurityToken(
-               issuer: "turismoreal.cl",
-               audience: "Turistas",
-               claims: claims,
-               expires: expiration,
-               signingCredentials: creds);
-            return new Token(new JwtSecurityTokenHandler().WriteToken(token), expiration,usuario.Username,persona.Nombres,persona.Apellidos);
-        }
-
-        public static string Encriptar(String texto)
-        {
-            return new ASCIIEncoding()
-                .GetString(new SHA1CryptoServiceProvider()
-                .ComputeHash(Encoding.ASCII.GetBytes(texto)));
-        }
-        public static String CodigoAleatorio(String rut)
-        {
-            String clave = "";
-            int suma = DateTime.Now.Millisecond;
-            foreach (var c in rut)
-            {
-                suma += c;
-            }
-            var r = new Random(suma);
-            for (int i = 0; i < 10; i++)
-            {
-                int l = 65 + r.Next(57);
-                if (l >= 91 && l <= 96)
-                {
-                    l = 95;
-                }
-                clave += (char)l;
-            }
-            return clave;
         }
     }
     public class Token

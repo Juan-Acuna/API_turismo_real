@@ -45,13 +45,20 @@ namespace API_TurismoReal.Controllers
         [HttpGet("disponible/email/{email}")]
         public async Task<IActionResult> EmailDisponible([FromRoute]String email)
         {
-            bool d = true;
-            var u = await cmd.Find<Persona>("email",email);
-            if (u != null)
+            try
             {
-                d = false;
+                bool d = true;
+                var u = await cmd.Find<Persona>("email", email);
+                if (u.Count > 0)
+                {
+                    d = false;
+                }
+                return Ok(new { Disponible = d });
             }
-            return Ok(new { Disponible = d });
+            catch(Exception e)
+            {
+                return StatusCode(500, new { Error = e.Message });
+            }
         }
     }
 }
