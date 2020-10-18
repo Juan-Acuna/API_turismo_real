@@ -49,8 +49,8 @@ namespace API_TurismoReal.Controllers
                     return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
-            Foto f = await cmd.Get<Foto>(id);
-            if (f != null)
+            var f = await cmd.Find<Foto>("Id_depto",id);
+            if (f.Count > 0)
             {
                 return Ok(f);
             }

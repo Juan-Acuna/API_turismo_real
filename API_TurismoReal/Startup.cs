@@ -41,7 +41,7 @@ namespace API_TurismoReal
                      ValidIssuer = "turismoreal.cl",
                      ValidAudience = "Turistas",
                      IssuerSigningKey = new SymmetricSecurityKey(
-                     Encoding.UTF8.GetBytes("kdljsfksdda234jf654dkgfHGDjsfkFglDSAGFshgfdHgdHGdfjhgfjT$#tsj&iJStrhfhk")),
+                     Encoding.UTF8.GetBytes(Temp.SIGNINKEY)),
                      ClockSkew = TimeSpan.Zero
                  });
         }
