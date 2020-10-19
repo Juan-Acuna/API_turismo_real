@@ -15,7 +15,11 @@ namespace API_TurismoReal.Controllers
     public class DepartamentoController : ControllerBase
     {
         OracleCommandManager cmd = new OracleCommandManager(ConexionOracle.Conexion);
-
+        
+        [ProducesResponseType(typeof(List<Departamento>), 200)]
+        [ProducesResponseType(typeof(MensajeError), 400)]
+        [ProducesResponseType(typeof(MensajeError), 500)]
+        [ProducesResponseType(typeof(MensajeError), 504)]
         [HttpGet]
         public async Task<IActionResult> Get()
         {
@@ -27,13 +31,25 @@ namespace API_TurismoReal.Controllers
                     return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
-            List<Departamento> depto = await cmd.GetAll<Departamento>();
-            if (depto.Count > 0)
+            try
             {
-                return Ok(depto);
+                List<Departamento> depto = await cmd.GetAll<Departamento>();
+                if (depto.Count > 0)
+                {
+                    return Ok(depto);
+                }
+                return BadRequest(MensajeError.Nuevo("No se encontraron departamentos."));
             }
-            return BadRequest();
+            catch(Exception e)
+            {
+                return StatusCode(500, MensajeError.Nuevo(e.Message));
+            }
         }
+        
+        [ProducesResponseType(typeof(List<Departamento>), 200)]
+        [ProducesResponseType(typeof(MensajeError), 400)]
+        [ProducesResponseType(typeof(MensajeError), 500)]
+        [ProducesResponseType(typeof(MensajeError), 504)]
         [HttpGet("{id}")]
         public async Task<IActionResult> Get([FromRoute]int id)
         {
@@ -45,14 +61,26 @@ namespace API_TurismoReal.Controllers
                     return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
-            Departamento d = await cmd.Get<Departamento>(id);
-            if (d != null)
+            try
             {
-                return Ok(d);
+
+                Departamento d = await cmd.Get<Departamento>(id);
+                if (d != null)
+                {
+                    return Ok(d);
+                }
+                return BadRequest(MensajeError.Nuevo("No se encontró el departamento"));
             }
-            return BadRequest();
+            catch(Exception e)
+            {
+                return StatusCode(500, MensajeError.Nuevo(e.Message));
+            }
         }
         [Authorize(Roles = "1")]
+        [ProducesResponseType(typeof(Departamento), 200)]
+        [ProducesResponseType(typeof(MensajeError), 400)]
+        [ProducesResponseType(typeof(MensajeError), 500)]
+        [ProducesResponseType(typeof(MensajeError), 504)]
         [HttpPost]
         public async Task<IActionResult> Post([FromBody]Departamento depto)
         {
@@ -64,13 +92,24 @@ namespace API_TurismoReal.Controllers
                     return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
-            if (await cmd.Insert(depto))
+            try
             {
-                return Ok();
+                if (await cmd.Insert(depto))
+                {
+                    return Ok((await cmd.Find<Departamento>("Nombre",depto.Nombre))[0]);
+                }
+                return BadRequest(MensajeError.Nuevo("no se pudo insertar."));
             }
-            return BadRequest();
+            catch(Exception e)
+            {
+                return StatusCode(500, MensajeError.Nuevo(e.Message));
+            }
         }
         [Authorize(Roles = "1")]
+        [ProducesResponseType(typeof(Departamento), 200)]
+        [ProducesResponseType(typeof(MensajeError), 400)]
+        [ProducesResponseType(typeof(MensajeError), 500)]
+        [ProducesResponseType(typeof(MensajeError), 504)]
         [HttpPatch("{id}")]
         public async Task<IActionResult> Patch([FromRoute]int id, [FromBody]dynamic data)
         {
@@ -82,38 +121,47 @@ namespace API_TurismoReal.Controllers
                     return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
-            Departamento d = await cmd.Get<Departamento>(id);
-            if(data.nombre != null)
+            try
             {
-                d.Nombre = data.nombre;
-            }
-            if (data.direccion != null)
+                Departamento d = await cmd.Get<Departamento>(id);
+                if (data.nombre != null)
+                {
+                    d.Nombre = data.nombre;
+                }
+                if (data.direccion != null)
+                {
+                    d.Direccion = data.direccion;
+                }
+                if (data.arriendo != null)
+                {
+                    d.Arriendo = data.arriendo;
+                }
+                if (data.habitaciones != null)
+                {
+                    d.Habitaciones = data.habitaciones;
+                }
+                if (data.nombre != null)
+                {
+                    d.Nombre = data.nombre;
+                }
+                if (data.nombre != null)
+                {
+                    d.Nombre = data.nombre;
+                }
+                if (await cmd.Update(d))
+                {
+                    return Ok(await cmd.Get<Departamento>(id));
+                }
+                return BadRequest(MensajeError.Nuevo("No se pudo actualizar."));
+            }catch(Exception e)
             {
-                d.Direccion = data.direccion;
+                return StatusCode(500, MensajeError.Nuevo(e.Message));
             }
-            if (data.arriendo != null)
-            {
-                d.Arriendo = data.arriendo;
-            }
-            if (data.habitaciones != null)
-            {
-                d.Habitaciones = data.habitaciones;
-            }
-            if (data.nombre != null)
-            {
-                d.Nombre = data.nombre;
-            }
-            if (data.nombre != null)
-            {
-                d.Nombre = data.nombre;
-            }
-            if (await cmd.Update(d))
-            {
-                return Ok();
-            }
-            return BadRequest();
         }
         [Authorize(Roles = "1")]
+        [ProducesResponseType(typeof(MensajeError), 400)]
+        [ProducesResponseType(typeof(MensajeError), 500)]
+        [ProducesResponseType(typeof(MensajeError), 504)]
         [HttpDelete]
         public async Task<IActionResult> Delete([FromBody]Departamento depto)
         {
@@ -125,11 +173,17 @@ namespace API_TurismoReal.Controllers
                     return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
-            if (await cmd.Delete(depto))
+            try
             {
-                return Ok();
+                if (await cmd.Delete(depto))
+                {
+                    return Ok();
+                }
+                return BadRequest(MensajeError.Nuevo("No se pudo eliminar."));
+            }catch(Exception e)
+            {
+                return StatusCode(500, MensajeError.Nuevo(e.Message));
             }
-            return BadRequest();
         }
     }
 }

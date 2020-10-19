@@ -20,6 +20,10 @@ namespace API_TurismoReal.Controllers
     {
         OracleCommandManager cmd = new OracleCommandManager(ConexionOracle.Conexion);
 
+        [ProducesResponseType(typeof(List<Foto>), 200)]
+        [ProducesResponseType(typeof(MensajeError), 400)]
+        [ProducesResponseType(typeof(MensajeError), 500)]
+        [ProducesResponseType(typeof(MensajeError), 504)]
         [HttpGet]
         public async Task<IActionResult> Get()
         {
@@ -31,13 +35,24 @@ namespace API_TurismoReal.Controllers
                     return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
-            List<Foto> f = await cmd.GetAll<Foto>();
-            if (f.Count > 0)
+            try
             {
-                return Ok(f);
+                List<Foto> f = await cmd.GetAll<Foto>();
+                if (f.Count > 0)
+                {
+                    return Ok(f);
+                }
+                return BadRequest(MensajeError.Nuevo("No se encontraron imagenes."));
             }
-            return BadRequest();
+            catch(Exception e)
+            {
+                return StatusCode(500, MensajeError.Nuevo(e.Message));
+            }
         }
+        [ProducesResponseType(typeof(List<Foto>), 200)]
+        [ProducesResponseType(typeof(MensajeError), 400)]
+        [ProducesResponseType(typeof(MensajeError), 500)]
+        [ProducesResponseType(typeof(MensajeError), 504)]
         [HttpGet("{id}")]
         public async Task<IActionResult> Get([FromRoute]int id)
         {
@@ -49,14 +64,25 @@ namespace API_TurismoReal.Controllers
                     return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
-            var f = await cmd.Find<Foto>("Id_depto",id);
-            if (f.Count > 0)
+            try
             {
-                return Ok(f);
+                var f = await cmd.Find<Foto>("Id_depto", id);
+                if (f.Count > 0)
+                {
+                    return Ok(f);
+                }
+                return BadRequest(MensajeError.Nuevo("No existen imagenes del departamento."));
             }
-            return BadRequest();
+            catch(Exception e)
+            {
+                return StatusCode(500, MensajeError.Nuevo(e.Message));
+            }
         }
         [Authorize(Roles = "1")]
+        [ProducesResponseType(typeof(MensajeCorriente), 200)]
+        [ProducesResponseType(typeof(MensajeError), 400)]
+        [ProducesResponseType(typeof(MensajeError), 500)]
+        [ProducesResponseType(typeof(MensajeError), 504)]
         [HttpPost("{id_depto}")]
         public async Task<IActionResult> Post([FromForm]List<IFormFile> imagenes,[FromRoute]int id_depto)
         {
@@ -128,6 +154,9 @@ namespace API_TurismoReal.Controllers
             }
         }
         [Authorize(Roles = "1")]
+        [ProducesResponseType(typeof(MensajeError), 400)]
+        [ProducesResponseType(typeof(MensajeError), 500)]
+        [ProducesResponseType(typeof(MensajeError), 504)]
         [HttpPatch]
         public async Task<IActionResult> Patch([FromForm]List<IFormFile> imagenes)
         {
@@ -139,15 +168,24 @@ namespace API_TurismoReal.Controllers
                     return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
-            List<String> l = new List<string>();
-            foreach(var imagen in imagenes)
+            try
             {
-                l.Add(imagen.FileName);
+                List<String> l = new List<string>();
+                foreach (var imagen in imagenes)
+                {
+                    l.Add(imagen.FileName);
+                }
+                return Ok(l);
             }
-            return Ok(l);
-            //return BadRequest();
+            catch(Exception e)
+            {
+                return StatusCode(500, MensajeError.Nuevo(e.Message));
+            }
         }
         [Authorize(Roles = "1")]
+        [ProducesResponseType(typeof(MensajeError), 400)]
+        [ProducesResponseType(typeof(MensajeError), 500)]
+        [ProducesResponseType(typeof(MensajeError), 504)]
         [HttpDelete]
         public async Task<IActionResult> Delete([FromBody]Foto f)
         {
@@ -159,11 +197,17 @@ namespace API_TurismoReal.Controllers
                     return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
-            if (await cmd.Delete(f))
+            try
             {
-                return Ok();
+                if (await cmd.Delete(f))
+                {
+                    return Ok();
+                }
+                return BadRequest();
+            }catch(Exception e)
+            {
+                return StatusCode(500, MensajeError.Nuevo(e.Message));
             }
-            return BadRequest();
         }
     }
 }

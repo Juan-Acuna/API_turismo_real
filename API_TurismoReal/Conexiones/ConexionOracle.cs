@@ -1,4 +1,5 @@
-﻿using Oracle.ManagedDataAccess.Client;
+﻿using API_TurismoReal.Models;
+using Oracle.ManagedDataAccess.Client;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -61,20 +62,12 @@ namespace API_TurismoReal.Conexiones
                 }
             }
         }
-        public static NoConResponseClass NoConResponse
+        public static MensajeError NoConResponse
         {
             get
             {
-                return new NoConResponseClass("No se pudo establecer comunicacion con la base de datos");
+                return MensajeError.Nuevo("No se pudo establecer comunicacion con la base de datos");
             }
-        }
-    }
-    public class NoConResponseClass
-    {
-        public String Error;
-        public NoConResponseClass(String e)
-        {
-            Error = e;
         }
     }
 }
