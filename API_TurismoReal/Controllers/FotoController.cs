@@ -100,7 +100,7 @@ namespace API_TurismoReal.Controllers
             Foto f;
             Procedimiento p = new Procedimiento(ConexionOracle.Conexion,"SP_ID_FOTO");
             p.Parametros.Add("id_depto", OracleDbType.Int32, ParameterDirection.Output);
-            String rutaBase = "D:\\HostingSpaces\\unusuario256\\turismoreal.xyz\\public_html\\wwwroot\\";
+            String rutaBase = Temp.RUTA_RAIZ;
             try
             {
                 if (imagenes.Count > 0)

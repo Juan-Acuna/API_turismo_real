@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using API_TurismoReal.Conexiones;
@@ -96,6 +97,11 @@ namespace API_TurismoReal.Controllers
             {
                 if (await cmd.Insert(depto))
                 {
+                    var l = await cmd.Get<Localidad>(depto.Id_depto);
+                    if (!Directory.Exists(Temp.RUTA_RAIZ + "img\\" + Tools.ToUrlCompatible(l.Nombre) + "\\" + Tools.ToUrlCompatible(depto.Nombre) + "\\"))
+                    {
+                        Directory.CreateDirectory(Temp.RUTA_RAIZ + "img\\" + Tools.ToUrlCompatible(l.Nombre) + "\\" + Tools.ToUrlCompatible(depto.Nombre));
+                    }
                     return Ok((await cmd.Find<Departamento>("Nombre",depto.Nombre))[0]);
                 }
                 return BadRequest(MensajeError.Nuevo("no se pudo insertar."));
@@ -162,8 +168,8 @@ namespace API_TurismoReal.Controllers
         [ProducesResponseType(typeof(MensajeError), 400)]
         [ProducesResponseType(typeof(MensajeError), 500)]
         [ProducesResponseType(typeof(MensajeError), 504)]
-        [HttpDelete]
-        public async Task<IActionResult> Delete([FromBody]Departamento depto)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete([FromRoute]int id)
         {
             if (!ConexionOracle.Activa)
             {
@@ -175,7 +181,8 @@ namespace API_TurismoReal.Controllers
             }
             try
             {
-                if (await cmd.Delete(depto))
+                var d = await cmd.Get<Departamento>(id);
+                if (await cmd.Delete(d))
                 {
                     return Ok();
                 }
