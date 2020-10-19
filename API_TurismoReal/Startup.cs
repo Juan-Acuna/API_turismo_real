@@ -44,6 +44,9 @@ namespace API_TurismoReal
                      Encoding.UTF8.GetBytes(Temp.SIGNINKEY)),
                      ClockSkew = TimeSpan.Zero
                  });
+            services.AddSwaggerGen(c => {
+                c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "API Turismo Real", Version = "V1" });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -56,6 +59,11 @@ namespace API_TurismoReal
             app.UseStaticFiles();
             app.UseAuthentication();
             app.UseMvc();
+            app.UseSwagger();
+            app.UseSwaggerUI(c => {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "API Turismo Real V1");
+                c.RoutePrefix = string.Empty;
+            });
         }
     }
 }
