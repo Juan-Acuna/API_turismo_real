@@ -60,5 +60,41 @@ namespace API_TurismoReal.Controllers
                 return StatusCode(500, new { Error = e.Message });
             }
         }
+        [HttpGet("disponible/localidad/{nombre}")]
+        public async Task<IActionResult> LocalidadDisponible([FromRoute]String nombre)
+        {
+            try
+            {
+                bool d = true;
+                var u = await cmd.Find<Localidad>("Nombre", nombre);
+                if (u.Count > 0)
+                {
+                    d = false;
+                }
+                return Ok(new { Disponible = d });
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, new { Error = e.Message });
+            }
+        }
+        [HttpGet("disponible/depto/{nombre}")]
+        public async Task<IActionResult> DeptoDisponible([FromRoute]String nombre)
+        {
+            try
+            {
+                bool d = true;
+                var u = await cmd.Find<Departamento>("Nombre", nombre);
+                if (u.Count > 0)
+                {
+                    d = false;
+                }
+                return Ok(new { Disponible = d });
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, new { Error = e.Message });
+            }
+        }
     }
 }
