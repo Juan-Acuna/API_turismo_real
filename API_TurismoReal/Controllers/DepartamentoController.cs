@@ -95,6 +95,7 @@ namespace API_TurismoReal.Controllers
             }
             try
             {
+                depto.Id_estado = 1;
                 if (await cmd.Insert(depto))
                 {
                     var l = await cmd.Get<Localidad>(depto.Id_depto);
@@ -130,29 +131,45 @@ namespace API_TurismoReal.Controllers
             try
             {
                 Departamento d = await cmd.Get<Departamento>(id);
-                if (data.nombre != null)
+                if (data.Nombre != null)
                 {
-                    d.Nombre = data.nombre;
+                    d.Nombre = data.Nombre;
                 }
-                if (data.direccion != null)
+                if (data.Direccion != null)
                 {
-                    d.Direccion = data.direccion;
+                    d.Direccion = data.Direccion;
                 }
-                if (data.arriendo != null)
+                if (data.Arriendo != null)
                 {
-                    d.Arriendo = data.arriendo;
+                    d.Arriendo = data.Arriendo;
                 }
-                if (data.habitaciones != null)
+                if (data.Habitaciones != null)
                 {
-                    d.Habitaciones = data.habitaciones;
+                    d.Habitaciones = data.Habitaciones;
                 }
-                if (data.nombre != null)
+                if (data.Id_localidad != null)
                 {
-                    d.Nombre = data.nombre;
+                    d.Id_localidad = data.Id_localidad;
                 }
-                if (data.nombre != null)
+                if (data.Mts_cuadrados != null)
                 {
-                    d.Nombre = data.nombre;
+                    d.Mts_cuadrados = data.Mts_cuadrados;
+                }
+                if (data.Banos != null)
+                {
+                    d.Banos = data.Banos;
+                }
+                if (data.Dividendo != null)
+                {
+                    d.Dividendo = data.Dividendo;
+                }
+                if (data.Id_estado != null)
+                {
+                    d.Id_estado = data.Id_estado;
+                }
+                if (data.Contribuciones != null)
+                {
+                    d.Contribuciones = data.Contribuciones;
                 }
                 if (await cmd.Update(d))
                 {
