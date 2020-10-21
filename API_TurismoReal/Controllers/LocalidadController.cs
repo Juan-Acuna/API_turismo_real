@@ -139,8 +139,8 @@ namespace API_TurismoReal.Controllers
         [ProducesResponseType(typeof(MensajeError), 400)]
         [ProducesResponseType(typeof(MensajeError), 500)]
         [ProducesResponseType(typeof(MensajeError), 504)]
-        [HttpDelete]
-        public async Task<IActionResult> Delete([FromBody]Localidad l)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete([FromBody]int id)
         {
             if (!ConexionOracle.Activa)
             {
@@ -152,6 +152,7 @@ namespace API_TurismoReal.Controllers
             }
             try
             {
+                Localidad l = await cmd.Get<Localidad>(id);
                 if (await cmd.Delete(l))
                 {
                     return Ok();

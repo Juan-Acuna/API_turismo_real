@@ -98,12 +98,12 @@ namespace API_TurismoReal.Controllers
                 depto.Id_estado = 1;
                 if (await cmd.Insert(depto))
                 {
-                    var l = await cmd.Get<Localidad>(depto.Id_depto);
+                    var l = await cmd.Get<Localidad>(depto.Id_localidad);
                     if (!Directory.Exists(Temp.RUTA_RAIZ + "img\\" + Tools.ToUrlCompatible(l.Nombre) + "\\" + Tools.ToUrlCompatible(depto.Nombre) + "\\"))
                     {
                         Directory.CreateDirectory(Temp.RUTA_RAIZ + "img\\" + Tools.ToUrlCompatible(l.Nombre) + "\\" + Tools.ToUrlCompatible(depto.Nombre));
                     }
-                    return Ok((await cmd.Find<Departamento>("Nombre",depto.Nombre))[0]);
+                    return Ok((await cmd.Find<Departamento>("Nombre",depto.Nombre)));
                 }
                 return BadRequest(MensajeError.Nuevo("no se pudo insertar."));
             }

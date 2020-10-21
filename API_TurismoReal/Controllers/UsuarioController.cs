@@ -280,8 +280,8 @@ namespace API_TurismoReal.Controllers
         }
 
         [Authorize(Roles = "1")]
-        [HttpDelete]
-        public async Task<IActionResult> Delete([FromBody]Usuario usuario)
+        [HttpDelete("{username}")]
+        public async Task<IActionResult> Delete([FromBody]String username)
         {
             if (!ConexionOracle.Activa)
             {
@@ -291,11 +291,24 @@ namespace API_TurismoReal.Controllers
                     return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
-            if (await cmd.Delete(usuario))
+            try
             {
-                return Ok();
+                Usuario usuario = await cmd.Get<Usuario>(username);
+                Persona p = await cmd.Get<Persona>(usuario.Rut);
+                if (await cmd.Delete(usuario))
+                {
+                    if (await cmd.Delete(p))
+                    {
+                        return Ok();
+                    }
+                    return BadRequest();
+                }
+                return BadRequest();
             }
-            return BadRequest();
+            catch(Exception e)
+            {
+                return StatusCode(500, MensajeError.Nuevo(e.Message));
+            }
         }
     }
 }

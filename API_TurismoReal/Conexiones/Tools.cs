@@ -186,7 +186,7 @@ namespace API_TurismoReal.Conexiones
                     r += '_';
                 }
             }
-            return r;
+            return r.ToLower();
         }
     }
 }
