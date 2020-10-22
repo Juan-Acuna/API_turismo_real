@@ -44,7 +44,7 @@ namespace API_TurismoReal.Controllers
                 }
                 return BadRequest(MensajeError.Nuevo("No se encontraron imagenes."));
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return StatusCode(500, MensajeError.Nuevo(e.Message));
             }
@@ -73,7 +73,7 @@ namespace API_TurismoReal.Controllers
                 }
                 return BadRequest(MensajeError.Nuevo("No existen imagenes del departamento."));
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return StatusCode(500, MensajeError.Nuevo(e.Message));
             }
@@ -84,7 +84,7 @@ namespace API_TurismoReal.Controllers
         [ProducesResponseType(typeof(MensajeError), 500)]
         [ProducesResponseType(typeof(MensajeError), 504)]
         [HttpPost("{id_depto}")]
-        public async Task<IActionResult> Post([FromForm]List<IFormFile> imagenes,[FromRoute]int id_depto)
+        public async Task<IActionResult> Post([FromForm]List<IFormFile> imagenes, [FromRoute]int id_depto)
         {
             if (!ConexionOracle.Activa)
             {
@@ -98,7 +98,7 @@ namespace API_TurismoReal.Controllers
             Localidad localidad = await cmd.Get<Localidad>(depto.Id_localidad);
             List<Foto> listaFotos = new List<Foto>();
             Foto f;
-            Procedimiento p = new Procedimiento(ConexionOracle.Conexion,"SP_ID_FOTO");
+            Procedimiento p = new Procedimiento(ConexionOracle.Conexion, "SP_ID_FOTO");
             p.Parametros.Add("id_depto", OracleDbType.Int32, ParameterDirection.Output);
             String rutaBase = Temp.RUTA_RAIZ;
             try
@@ -109,7 +109,7 @@ namespace API_TurismoReal.Controllers
                     {
                         await p.Ejecutar();
                         int idf = Convert.ToInt32((decimal)(OracleDecimal)(p.Parametros["id_depto"].Value));
-                        String subruta = "img\\" + Tools.ToUrlCompatible(localidad.Nombre.ToLower()) + "\\" + Tools.ToUrlCompatible(depto.Nombre.ToLower()) + "\\" + Tools.ToUrlCompatible(depto.Nombre.ToUpper().Replace(" ", "_")) + "_" + idf.ToString() + Path.GetExtension(foto.FileName);
+                        String subruta = "img\\" + Tools.ToUrlCompatible(localidad.Nombre.ToLower()) + "\\" + Tools.ToUrlCompatible(depto.Nombre.ToLower()) + "\\" + Tools.ToUrlCompatible(depto.Nombre.Replace(" ", "_")).ToUpper() + "_" + idf.ToString() + Path.GetExtension(foto.FileName);
                         using (var stream = System.IO.File.Create(rutaBase + subruta))
                         {
                             await foto.CopyToAsync(stream);
@@ -117,7 +117,7 @@ namespace API_TurismoReal.Controllers
                         f = new Foto
                         {
                             Id_foto = idf,
-                            Ruta = ("http://turismoreal.xyz/" + subruta).Replace("\\","/"),
+                            Ruta = ("http://turismoreal.xyz/" + subruta).Replace("\\", "/"),
                             Id_depto = depto.Id_depto
                         };
                         listaFotos.Add(f);
@@ -125,7 +125,7 @@ namespace API_TurismoReal.Controllers
                     int cont = 0;
                     foreach (var item in listaFotos)
                     {
-                        if (await cmd.Insert(item,false))
+                        if (await cmd.Insert(item, false))
                         {
                             cont++;
                         }
@@ -157,37 +157,8 @@ namespace API_TurismoReal.Controllers
         [ProducesResponseType(typeof(MensajeError), 400)]
         [ProducesResponseType(typeof(MensajeError), 500)]
         [ProducesResponseType(typeof(MensajeError), 504)]
-        [HttpPatch]
-        public async Task<IActionResult> Patch([FromForm]List<IFormFile> imagenes)
-        {
-            if (!ConexionOracle.Activa)
-            {
-                ConexionOracle.Open();
-                if (!ConexionOracle.Activa)
-                {
-                    return StatusCode(504, ConexionOracle.NoConResponse);
-                }
-            }
-            try
-            {
-                List<String> l = new List<string>();
-                foreach (var imagen in imagenes)
-                {
-                    l.Add(imagen.FileName);
-                }
-                return Ok(l);
-            }
-            catch(Exception e)
-            {
-                return StatusCode(500, MensajeError.Nuevo(e.Message));
-            }
-        }
-        [Authorize(Roles = "1")]
-        [ProducesResponseType(typeof(MensajeError), 400)]
-        [ProducesResponseType(typeof(MensajeError), 500)]
-        [ProducesResponseType(typeof(MensajeError), 504)]
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete([FromBody]int id)
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> Patch([FromForm]IFormFile imagen,[FromRoute]int id)
         {
             if (!ConexionOracle.Activa)
             {
@@ -200,6 +171,56 @@ namespace API_TurismoReal.Controllers
             try
             {
                 Foto f = await cmd.Get<Foto>(id);
+                Departamento d = await cmd.Get<Departamento>(f.Id_depto);
+                Localidad l = await cmd.Get<Localidad>(d.Id_localidad);
+                String rutaBase = Temp.RUTA_RAIZ;
+                String subruta = "img\\" + Tools.ToUrlCompatible(l.Nombre.ToLower()) + "\\" + Tools.ToUrlCompatible(d.Nombre.ToLower()) + "\\" + Tools.ToUrlCompatible(d.Nombre.Replace(" ", "_")).ToUpper() + "_" + id.ToString() + Path.GetExtension(imagen.FileName);
+                using (var stream = System.IO.File.Create(rutaBase + subruta))
+                {
+                    await imagen.CopyToAsync(stream);
+                }
+                var s = "img\\" + Tools.ToUrlCompatible(l.Nombre.ToLower()) + "\\" + Tools.ToUrlCompatible(d.Nombre.ToLower()) + "\\" + f.Ruta.Split("/").Last();
+                if (System.IO.File.Exists(rutaBase + s))
+                {
+                    System.IO.File.Delete(rutaBase + s);
+                }
+                f.Ruta = ("http://turismoreal.xyz/" + subruta).Replace("\\", "/");
+                if(await cmd.Update(f))
+                {
+                    return Ok();
+                }
+                return BadRequest();
+            }
+            catch(Exception e)
+            {
+                return StatusCode(500, MensajeError.Nuevo(e.Message));
+            }
+        }
+        [Authorize(Roles = "1")]
+        [ProducesResponseType(typeof(MensajeError), 400)]
+        [ProducesResponseType(typeof(MensajeError), 500)]
+        [ProducesResponseType(typeof(MensajeError), 504)]
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete([FromRoute]int id)
+        {
+            if (!ConexionOracle.Activa)
+            {
+                ConexionOracle.Open();
+                if (!ConexionOracle.Activa)
+                {
+                    return StatusCode(504, ConexionOracle.NoConResponse);
+                }
+            }
+            try
+            {
+                Foto f = await cmd.Get<Foto>(id);
+                Departamento d = await cmd.Get<Departamento>(f.Id_depto);
+                Localidad l = await cmd.Get<Localidad>(d.Id_localidad);
+                String ruta = Temp.RUTA_RAIZ + "img\\" + Tools.ToUrlCompatible(l.Nombre.ToLower()) + "\\" + Tools.ToUrlCompatible(d.Nombre.ToLower()) + "\\" + f.Ruta.Split('/').Last().ToUpper();
+                if (System.IO.File.Exists(ruta))
+                {
+                    System.IO.File.Delete(ruta);
+                }
                 if (await cmd.Delete(f))
                 {
                     return Ok();
