@@ -30,7 +30,45 @@ namespace API_TurismoReal.Controllers
             List<DeptoArticulo> art = await cmd.Find<DeptoArticulo>("Id_articulo",id);
             if (art.Count > 0)
             {
-                return Ok(art);
+                var d = await cmd.Get<Departamento>(art[0].Id_depto);
+                return Ok(d);
+            }
+            return BadRequest();
+        }
+        [Authorize(Roles = "1")]
+        [HttpPost("asignar")]
+        public async Task<IActionResult> Asignar([FromBody]DeptoArticulo da)
+        {
+            if (!ConexionOracle.Activa)
+            {
+                ConexionOracle.Open();
+                if (!ConexionOracle.Activa)
+                {
+                    return StatusCode(504, ConexionOracle.NoConResponse);
+                }
+            }
+            if (await cmd.Insert(da,false))
+            {
+                return Ok();
+            }
+            return BadRequest();
+        }
+        [Authorize(Roles = "1,2")]
+        [HttpDelete("desasignar/{id}")]
+        public async Task<IActionResult> Desasignar([FromRoute]int id)
+        {
+            if (!ConexionOracle.Activa)
+            {
+                ConexionOracle.Open();
+                if (!ConexionOracle.Activa)
+                {
+                    return StatusCode(504, ConexionOracle.NoConResponse);
+                }
+            }
+            var da = (await cmd.Find<DeptoArticulo>("Id_articulo", id))[0];
+            if (await cmd.Delete(da))
+            {
+                return Ok();
             }
             return BadRequest();
         }

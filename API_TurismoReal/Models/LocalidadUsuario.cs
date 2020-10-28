@@ -4,6 +4,7 @@ namespace API_TurismoReal.Models
 {
     public class LocalidadUsuario
     {
-        public String Rut { get; set; } //PRIMARY KEY
+        public String Username { get; set; }
+        public int Id_depto { get; set; }
     }
 }

@@ -39,7 +39,7 @@ namespace API_TurismoReal.Controllers
                 try
                 {
                     PaymentsResponse response = p.PaymentsGet(notificationToken);
-                    if (response.ReceiverId.Equals(Configuration.ReceiverId))
+                    if (response.ReceiverId.Equals(Secret.T_RESEIVER_ID))
                     {
                         tr = await cmd.Get<Transaccion>(response.TransactionId);
                         if(response.Status.Equals("done") && response.Amount == tr.Monto)

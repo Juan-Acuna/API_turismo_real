@@ -17,6 +17,64 @@ namespace API_TurismoReal.Controllers
     {
         OracleCommandManager cmd = new OracleCommandManager(ConexionOracle.Conexion);
 
+        [Authorize(Roles = "1,2,3,4")]
+        [HttpGet("asignado/{username}")]
+        public async Task<IActionResult> Asignado([FromRoute]String username)
+        {
+            if (!ConexionOracle.Activa)
+            {
+                ConexionOracle.Open();
+                if (!ConexionOracle.Activa)
+                {
+                    return StatusCode(504, ConexionOracle.NoConResponse);
+                }
+            }
+            var l = await cmd.Find<LocalidadUsuario>("Id_articulo", username);
+            if (l.Count > 0)
+            {
+                var u = await cmd.Get<Usuario>(l[0].Username);
+                return Ok(u);
+            }
+            return BadRequest();
+        }
+        [Authorize(Roles = "1")]
+        [HttpPost("asignar")]
+        public async Task<IActionResult> Asignar([FromBody]LocalidadUsuario lu)
+        {
+            if (!ConexionOracle.Activa)
+            {
+                ConexionOracle.Open();
+                if (!ConexionOracle.Activa)
+                {
+                    return StatusCode(504, ConexionOracle.NoConResponse);
+                }
+            }
+            if (await cmd.Insert(lu,false))
+            {
+                return Ok();
+            }
+            return BadRequest();
+        }
+        [Authorize(Roles = "1,2")]
+        [HttpDelete("desasignar/{username}")]
+        public async Task<IActionResult> Desasignar([FromRoute]String username)
+        {
+            if (!ConexionOracle.Activa)
+            {
+                ConexionOracle.Open();
+                if (!ConexionOracle.Activa)
+                {
+                    return StatusCode(504, ConexionOracle.NoConResponse);
+                }
+            }
+            var lu = (await cmd.Find<LocalidadUsuario>("username", username))[0];
+            if (await cmd.Delete(lu))
+            {
+                return Ok();
+            }
+            return BadRequest();
+        }
+
         [ProducesResponseType(typeof(List<Localidad>), 200)]
         [ProducesResponseType(typeof(MensajeError), 400)]
         [ProducesResponseType(typeof(MensajeError), 500)]
