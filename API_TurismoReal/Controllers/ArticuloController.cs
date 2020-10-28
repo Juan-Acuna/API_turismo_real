@@ -16,6 +16,25 @@ namespace API_TurismoReal.Controllers
     {
         OracleCommandManager cmd = new OracleCommandManager(ConexionOracle.Conexion);
         [Authorize(Roles = "1,2")]
+        [HttpGet("asignado/{id}")]
+        public async Task<IActionResult> Asignado([FromRoute]int id)
+        {
+            if (!ConexionOracle.Activa)
+            {
+                ConexionOracle.Open();
+                if (!ConexionOracle.Activa)
+                {
+                    return StatusCode(504, ConexionOracle.NoConResponse);
+                }
+            }
+            List<DeptoArticulo> art = await cmd.Find<DeptoArticulo>("Id_articulo",id);
+            if (art.Count > 0)
+            {
+                return Ok(art);
+            }
+            return BadRequest();
+        }
+        [Authorize(Roles = "1,2")]
         [HttpGet]
         public async Task<IActionResult> Get()
         {
