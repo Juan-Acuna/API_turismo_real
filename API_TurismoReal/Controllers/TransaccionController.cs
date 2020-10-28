@@ -5,6 +5,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using API_TurismoReal.Conexiones;
 using API_TurismoReal.Models;
+using Khipu.Api;
+using Khipu.Client;
+using Khipu.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -25,18 +28,20 @@ namespace API_TurismoReal.Controllers
             var t = await cmd.Get<Transaccion>(id);
             return Ok(new { Listo = t.Listo == '1' });
         }
-        /*
+
         [HttpPost("notificar")]
-        public IActionResult Notificar([FromBody]String apiVersion, [FromBody]String notificationToken)
+        public async Task<IActionResult> Notificar([FromBody]dynamic data)
         {
+            String apiVersion = data.apiVersion;
+            String notificationToken = data.notificationToken;
             if (apiVersion.Equals("1.3"))
             {
                 Transaccion tr;
-                //PaymentsApi p = new PaymentsApi();
+                PaymentsApi p = new PaymentsApi();
                 try
                 {
-                    //PaymentsResponse response = p.PaymentsGet(notificationToken);
-                    /*if (response.ReceiverId.Equals(Secret.T_RESEIVER_ID))
+                    PaymentsResponse response = p.PaymentsGet(notificationToken);
+                    if (response.ReceiverId.Equals(Secret.T_RESEIVER_ID))
                     {
                         tr = await cmd.Get<Transaccion>(response.TransactionId);
                         if(response.Status.Equals("done") && response.Amount == tr.Monto)
@@ -78,7 +83,7 @@ namespace API_TurismoReal.Controllers
             }
             return Ok();
         }
-*/
+
         [Authorize(Roles = "1")]
         [HttpGet]
         public async Task<IActionResult> Get()
@@ -136,11 +141,11 @@ namespace API_TurismoReal.Controllers
                 await p.Ejecutar();
                 int idf = Convert.ToInt32((decimal)(OracleDecimal)(p.Parametros["id_pago"].Value));
                 String trId = "TTR" + idf.ToString();
-                /* ZONA KHIPU *//*
+                /* ZONA KHIPU */
                 Configuration.ReceiverId = Secret.T_RESEIVER_ID;
                 Configuration.Secret = Secret.T_SECRET_KEY;
                 PaymentsApi pago = new PaymentsApi();
-                PaymentsCreateResponse response = pago.PaymentsPost(t.Comentario, "CLP", t.Monto,transactionId:trId);*/
+                PaymentsCreateResponse response = pago.PaymentsPost(t.Comentario, "CLP", t.Monto,transactionId:trId);
                 /**/
                 t.Id_pago = trId;
                 t.Fecha = DateTime.Now;
@@ -151,7 +156,7 @@ namespace API_TurismoReal.Controllers
                 {
                     return Ok();
                 }
-                return Ok(t);
+                return Ok(response);
             }
             catch(Exception e)
             {
