@@ -84,7 +84,7 @@ namespace API_TurismoReal.Controllers
         }
         [Authorize(Roles = "2,4,5")]
         [HttpPatch]
-        public async Task<IActionResult> Patch([FromBody]Reserva r)
+        public async Task<IActionResult> Patch([FromBody]dynamic data)
         {
             if (!ConexionOracle.Activa)
             {
@@ -93,6 +93,43 @@ namespace API_TurismoReal.Controllers
                 {
                     return StatusCode(504, ConexionOracle.NoConResponse);
                 }
+            }
+            Reserva r = new Reserva();
+            if (data.Valor_total != null)
+            {
+                r.Valor_total = data.Valor_total;
+            }
+            if (data.Valor_pagado != null)
+            {
+                r.Valor_pagado = data.Valor_pagado;
+            }
+            if (data.Inicio_estadia != null)
+            {
+                r.Inicio_estadia = data.Inicio_estadia;
+            }
+            if (data.Fin_estadia != null)
+            {
+                r.Fin_estadia = data.Fin_estadia;
+            }
+            if (data.Desc_checkin != null)
+            {
+                r.Desc_checkin = data.Desc_checkin;
+            }
+            if (data.Desc_checkout != null)
+            {
+                r.Desc_checkout = data.Desc_checkout;
+            }
+            if (data.Multa_total != null)
+            {
+                r.Multa_total = data.Multa_total;
+            }
+            if (data.Multa_pagado != null)
+            {
+                r.Multa_pagado = data.Multa_pagado;
+            }
+            if (data.Id_estado != null)
+            {
+                r.Id_estado = data.Id_estado;
             }
             if (await cmd.Update(r))
             {

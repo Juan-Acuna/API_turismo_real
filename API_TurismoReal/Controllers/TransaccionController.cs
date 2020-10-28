@@ -48,14 +48,37 @@ namespace API_TurismoReal.Controllers
                             tr.Token = response.NotificationToken;
                             Reserva r = await cmd.Get<Reserva>(tr.Id_reserva);
                             r.Valor_pagado += tr.Monto;
+                            if (r.Valor_pagado == r.Valor_total)
+                            {
+                                r.Id_estado = 3;
+                            }
+                            else
+                            {
+                                r.Id_estado = 2;
+                            }
+                            await cmd.Update(r);
+                            var list = await cmd.Find<Reserva>("Username", tr.Username);
+                            List<Reserva> rl = new List<Reserva>();
+                            foreach(var res in list)
+                            {
+                                if(res.Id_estado==3 || res.Id_estado == 4)
+                                {
+                                    rl.Add(res);
+                                }
+                            }
+                            if (rl.Count>9)
+                            {
+                                var u = await cmd.Get<Usuario>(tr.Username);
+                                u.Frecuente = '1';
+                                await cmd.Update(u);
+                            }
                         }
                     }
-                }catch(ApiException ex)
+                }catch(Exception ex)
                 {
-
+                    return StatusCode(500, MensajeError.Nuevo(ex.Message));
                 }
             }
-
             return Ok();
         }
 
