@@ -25,9 +25,9 @@ namespace API_TurismoReal.Controllers
             var t = await cmd.Get<Transaccion>(id);
             return Ok(new { Listo = t.Listo == '1' });
         }
-
+        /*
         [HttpPost("notificar")]
-        public async Task<IActionResult> Notificar([FromBody]String apiVersion, [FromBody]String notificationToken)
+        public IActionResult Notificar([FromBody]String apiVersion, [FromBody]String notificationToken)
         {
             if (apiVersion.Equals("1.3"))
             {
@@ -70,7 +70,7 @@ namespace API_TurismoReal.Controllers
                                 await cmd.Update(u);
                             }
                         }
-                    }*/
+                    }
                 }catch(Exception ex)
                 {
                     return StatusCode(500, MensajeError.Nuevo(ex.Message));
@@ -78,7 +78,7 @@ namespace API_TurismoReal.Controllers
             }
             return Ok();
         }
-
+*/
         [Authorize(Roles = "1")]
         [HttpGet]
         public async Task<IActionResult> Get()
