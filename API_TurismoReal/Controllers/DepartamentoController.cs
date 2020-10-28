@@ -99,9 +99,9 @@ namespace API_TurismoReal.Controllers
                 if (await cmd.Insert(depto))
                 {
                     var l = await cmd.Get<Localidad>(depto.Id_localidad);
-                    if (!Directory.Exists(Temp.RUTA_RAIZ + "img\\" + Tools.ToUrlCompatible(l.Nombre) + "\\" + Tools.ToUrlCompatible(depto.Nombre) + "\\"))
+                    if (!Directory.Exists(Secret.RUTA_RAIZ + "img\\" + Tools.ToUrlCompatible(l.Nombre) + "\\" + Tools.ToUrlCompatible(depto.Nombre) + "\\"))
                     {
-                        Directory.CreateDirectory(Temp.RUTA_RAIZ + "img\\" + Tools.ToUrlCompatible(l.Nombre) + "\\" + Tools.ToUrlCompatible(depto.Nombre));
+                        Directory.CreateDirectory(Secret.RUTA_RAIZ + "img\\" + Tools.ToUrlCompatible(l.Nombre) + "\\" + Tools.ToUrlCompatible(depto.Nombre));
                     }
                     return Ok((await cmd.Find<Departamento>("Nombre",depto.Nombre)));
                 }

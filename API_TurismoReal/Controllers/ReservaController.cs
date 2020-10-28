@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using API_TurismoReal.Conexiones;
@@ -7,6 +8,8 @@ using API_TurismoReal.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Oracle.ManagedDataAccess.Client;
+using Oracle.ManagedDataAccess.Types;
 
 namespace API_TurismoReal.Controllers
 {
@@ -65,9 +68,17 @@ namespace API_TurismoReal.Controllers
                     return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
-            if (await cmd.Insert(r))
+            Procedimiento p = new Procedimiento(ConexionOracle.Conexion, "SP_ID_RESERVA");
+            p.Parametros.Add("id_reserva", OracleDbType.Int32, ParameterDirection.Output);
+            await p.Ejecutar();
+            int idf = Convert.ToInt32((decimal)(OracleDecimal)(p.Parametros["id_reserva"].Value));
+            r.Id_reserva = idf;
+            r.Valor_pagado = 0;
+            r.Fecha = DateTime.Now;
+            r.Id_estado = 1;
+            if (await cmd.Insert(r,false))
             {
-                return Ok();
+                return Ok(r);
             }
             return BadRequest();
         }

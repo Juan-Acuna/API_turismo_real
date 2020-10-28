@@ -99,8 +99,8 @@ namespace API_TurismoReal.Controllers
             List<Foto> listaFotos = new List<Foto>();
             Foto f;
             Procedimiento p = new Procedimiento(ConexionOracle.Conexion, "SP_ID_FOTO");
-            p.Parametros.Add("id_depto", OracleDbType.Int32, ParameterDirection.Output);
-            String rutaBase = Temp.RUTA_RAIZ;
+            p.Parametros.Add("id_foto", OracleDbType.Int32, ParameterDirection.Output);//id_depto
+            String rutaBase = Secret.RUTA_RAIZ;
             try
             {
                 if (imagenes.Count > 0)
@@ -108,7 +108,7 @@ namespace API_TurismoReal.Controllers
                     foreach (var foto in imagenes)
                     {
                         await p.Ejecutar();
-                        int idf = Convert.ToInt32((decimal)(OracleDecimal)(p.Parametros["id_depto"].Value));
+                        int idf = Convert.ToInt32((decimal)(OracleDecimal)(p.Parametros["id_foto"].Value));
                         String subruta = "img\\" + Tools.ToUrlCompatible(localidad.Nombre.ToLower()) + "\\" + Tools.ToUrlCompatible(depto.Nombre.ToLower()) + "\\" + Tools.ToUrlCompatible(depto.Nombre.Replace(" ", "_")).ToUpper() + "_" + idf.ToString() + Path.GetExtension(foto.FileName);
                         using (var stream = System.IO.File.Create(rutaBase + subruta))
                         {
@@ -173,7 +173,7 @@ namespace API_TurismoReal.Controllers
                 Foto f = await cmd.Get<Foto>(id);
                 Departamento d = await cmd.Get<Departamento>(f.Id_depto);
                 Localidad l = await cmd.Get<Localidad>(d.Id_localidad);
-                String rutaBase = Temp.RUTA_RAIZ;
+                String rutaBase = Secret.RUTA_RAIZ;
                 String subruta = "img\\" + Tools.ToUrlCompatible(l.Nombre.ToLower()) + "\\" + Tools.ToUrlCompatible(d.Nombre.ToLower()) + "\\" + Tools.ToUrlCompatible(d.Nombre.Replace(" ", "_")).ToUpper() + "_" + id.ToString() + Path.GetExtension(imagen.FileName);
                 using (var stream = System.IO.File.Create(rutaBase + subruta))
                 {
@@ -216,7 +216,7 @@ namespace API_TurismoReal.Controllers
                 Foto f = await cmd.Get<Foto>(id);
                 Departamento d = await cmd.Get<Departamento>(f.Id_depto);
                 Localidad l = await cmd.Get<Localidad>(d.Id_localidad);
-                String ruta = Temp.RUTA_RAIZ + "img\\" + Tools.ToUrlCompatible(l.Nombre.ToLower()) + "\\" + Tools.ToUrlCompatible(d.Nombre.ToLower()) + "\\" + f.Ruta.Split('/').Last().ToUpper();
+                String ruta = Secret.RUTA_RAIZ + "img\\" + Tools.ToUrlCompatible(l.Nombre.ToLower()) + "\\" + Tools.ToUrlCompatible(d.Nombre.ToLower()) + "\\" + f.Ruta.Split('/').Last().ToUpper();
                 if (System.IO.File.Exists(ruta))
                 {
                     System.IO.File.Delete(ruta);

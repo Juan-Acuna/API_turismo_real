@@ -11,7 +11,7 @@ namespace API_TurismoReal.Conexiones
     {
         public static readonly String Nombre = "Turismo Real";
         public static readonly String Correo = "notificaciones@turismoreal.xyz";
-        public static readonly String Clave = Temp.CLAVE_CORREO;
+        public static readonly String Clave = Secret.CLAVE_CORREO;
         public static MailAddress DireccionEmail = new MailAddress(Correo, Nombre);
         static SmtpClient smtp = new SmtpClient
         {

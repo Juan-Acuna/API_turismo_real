@@ -41,7 +41,7 @@ namespace API_TurismoReal
                      ValidIssuer = "turismoreal.cl",
                      ValidAudience = "Turistas",
                      IssuerSigningKey = new SymmetricSecurityKey(
-                     Encoding.UTF8.GetBytes(Temp.SIGNINKEY)),
+                     Encoding.UTF8.GetBytes(Secret.SIGNINKEY)),
                      ClockSkew = TimeSpan.Zero
                  });
             services.AddSwaggerGen(c => {

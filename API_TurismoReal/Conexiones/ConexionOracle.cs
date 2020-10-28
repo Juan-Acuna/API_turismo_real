@@ -10,12 +10,12 @@ namespace API_TurismoReal.Conexiones
     public class ConexionOracle
     {
         //private const String SOURCE = "localhost:1521";//OFFLINE
-        private static String SOURCE = Temp.SERVIDOR;//ONLINE
-        private static String USER = Temp.USUARIO;
-        private static String PASSWD = Temp.CLAVE;
+        private static String SOURCE = Secret.SERVIDOR;//ONLINE
+        private static String USER = Secret.USUARIO;
+        private static String PASSWD = Secret.CLAVE;
         static String CON_STR = "DATA SOURCE=(DESCRIPTION =(ADDRESS_LIST =(ADDRESS = (PROTOCOL = TCP)(HOST = " + SOURCE + ")(PORT = 1521)))(CONNECT_DATA =(SERVICE_NAME = TREALDB)));USER ID=" + USER + ";PASSWORD="+PASSWD;
         public static OracleConnection _con = new OracleConnection(CON_STR);
-        public static OracleConnection _con2 = new OracleConnection("DATA SOURCE=85.208.22.168:1521;USER ID=turismo_real;PASSWORD=turismoCLAVEreal;");
+        public static OracleConnection _con2 = new OracleConnection(Secret.CONEXION_ANTIGUA);
         public static OracleConnection con;
         static bool con1 = false;
         private static ConexionOracle _instancia = new ConexionOracle();

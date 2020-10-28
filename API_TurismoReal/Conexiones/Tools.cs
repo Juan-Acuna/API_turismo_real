@@ -103,7 +103,7 @@ namespace API_TurismoReal.Conexiones
                 new Claim(JwtRegisteredClaimNames.UniqueName, usuario.Username),
                 new Claim(ClaimsIdentity.DefaultRoleClaimType,usuario.Id_rol.ToString())
             };
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Temp.SIGNINKEY));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Secret.SIGNINKEY));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var expiration = DateTime.UtcNow.AddHours(1);
