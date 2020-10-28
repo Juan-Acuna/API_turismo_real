@@ -8,6 +8,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace API_TurismoReal.Conexiones
 {
@@ -120,7 +121,26 @@ namespace API_TurismoReal.Conexiones
         {
             return new ASCIIEncoding()
                 .GetString(new SHA1CryptoServiceProvider()
-                .ComputeHash(Encoding.ASCII.GetBytes(texto)));
+                .ComputeHash(Encoding.UTF8.GetBytes(texto)));
+        }
+
+        public static String UrlEncode(String texto)
+        {
+            return HttpUtility.UrlEncode(texto);
+        }
+
+        public static String UrlDecode(String texto)
+        {
+            return HttpUtility.UrlDecode(texto);
+        }
+
+        public static String EncriptarHmacSHA256(string secret, string data)
+        {
+            using (HMACSHA256 hmac = new HMACSHA256(Encoding.UTF8.GetBytes(secret)))
+            {
+                byte[] hashValue = hmac.ComputeHash(Encoding.UTF8.GetBytes(data));
+                return BitConverter.ToString(hashValue).Replace("-", string.Empty).ToLower();
+            }
         }
         public static String CodigoAleatorio(String sal, int largo = 10)
         {
@@ -145,7 +165,7 @@ namespace API_TurismoReal.Conexiones
         public static String EncriptarUrlCompatible(String texto)
         {
             var encoding = new ASCIIEncoding();
-            var s = encoding.GetString(new SHA1CryptoServiceProvider().ComputeHash(Encoding.ASCII.GetBytes(texto)));
+            var s = encoding.GetString(new SHA1CryptoServiceProvider().ComputeHash(Encoding.UTF8.GetBytes(texto)));
             String r = "";
             foreach (var c in s)
             {

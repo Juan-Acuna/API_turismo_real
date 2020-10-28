@@ -223,60 +223,77 @@ namespace API_TurismoReal.Controllers
                     return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
-            Usuario u = await cmd.Get<Usuario>(username);
-            Persona p = await cmd.Get<Persona>(u.Rut);
-            if (data.Usuario.Clave != null || ((String)data.Usuario.Clave).Trim().Length>0)
+            try
             {
-                u.Clave = Tools.Encriptar((String)data.Usuario.Clave);
-            }
-            if (data.Usuario.Id_rol != null)
-            {
-                u.Id_rol = data.Usuario.Id_rol;
-            }
-            if (data.Usuario.Activo != null)
-            {
-                u.Activo = data.Usuario.Activo;
-            }
-            if (data.Persona.Nombres != null)
-            {
-                p.Nombres = data.Persona.Nombres;
-            }
-            if (data.Persona.Apellidos != null)
-            {
-                p.Apellidos = data.Persona.Apellidos;
-            }
-            if (data.Persona.Email != null)
-            {
-                p.Email = data.Persona.Email;
-            }
-            if (data.Persona.Telefono != null)
-            {
-                p.Telefono = data.Persona.Telefono;
-            }
-            if (data.Persona.Direccion != null)
-            {
-                p.Direccion = data.Persona.Direccion;
-            }
-            if (data.Persona.Comuna != null)
-            {
-                p.Comuna = data.Persona.Comuna;
-            }
-            if (data.Persona.Region != null)
-            {
-                p.Region = data.Persona.Region;
-            }
-            if (data.Persona.Id_genero != null)
-            {
-                p.Id_genero = data.Persona.Id_genero;
-            }
-            if (await cmd.Update(u))
-            {
-                if(await cmd.Update(p))
+                Usuario u = await cmd.Get<Usuario>(username);
+                Persona p = await cmd.Get<Persona>(u.Rut);
+                if(data.Usuario != null)
                 {
-                    return Ok();
+                    if (data.Usuario.Clave != null)
+                    {
+                        if (((String)data.Usuario.Clave).Trim().Length > 0)
+                        {
+                            u.Clave = Tools.Encriptar((String)data.Usuario.Clave);
+                        }
+                    }
+                    if (data.Usuario.Id_rol != null)
+                    {
+                        u.Id_rol = data.Usuario.Id_rol;
+                    }
+                    if (data.Usuario.Activo != null)
+                    {
+                        u.Activo = data.Usuario.Activo;
+                    }
                 }
+                if (data.Persona != null)
+                {
+                    if (data.Persona.Nombres != null)
+                    {
+                        p.Nombres = data.Persona.Nombres;
+                    }
+                    if (data.Persona.Apellidos != null)
+                    {
+                        p.Apellidos = data.Persona.Apellidos;
+                    }
+                    if (data.Persona.Email != null)
+                    {
+                        p.Email = data.Persona.Email;
+                    }
+                    if (data.Persona.Telefono != null)
+                    {
+                        p.Telefono = data.Persona.Telefono;
+                    }
+                    if (data.Persona.Direccion != null)
+                    {
+                        p.Direccion = data.Persona.Direccion;
+                    }
+                    if (data.Persona.Comuna != null)
+                    {
+                        p.Comuna = data.Persona.Comuna;
+                    }
+                    if (data.Persona.Region != null)
+                    {
+                        p.Region = data.Persona.Region;
+                    }
+                    if (data.Persona.Id_genero != null)
+                    {
+                        p.Id_genero = data.Persona.Id_genero;
+                    }
+                }
+                if (await cmd.Update(u))
+                {
+                    if (await cmd.Update(p))
+                    {
+                        return Ok();
+                    }
+                }
+                return BadRequest();
             }
-            return BadRequest();
+            catch(Exception e)
+            {
+                //return StatusCode(500, MensajeError.Nuevo(e.Message));
+                return StatusCode(500, e);
+            }
         }
 
         [Authorize(Roles = "1")]

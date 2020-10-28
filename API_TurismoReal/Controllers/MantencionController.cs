@@ -28,13 +28,46 @@ namespace API_TurismoReal.Controllers
                     return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
-            List<Mantencion> m = await cmd.GetAll<Mantencion>();
-            if (m.Count > 0)
+            try
             {
-                return Ok(m);
+                List<Mantencion> m = await cmd.GetAll<Mantencion>();
+                if (m.Count > 0)
+                {
+                    return Ok(m);
+                }
+                return BadRequest();
             }
-            return BadRequest();
+            catch(Exception e)
+            {
+                return StatusCode(500, MensajeError.Nuevo(e.Message));
+            }
         }
+        [HttpGet("depto/{id}")]
+        public async Task<IActionResult> Find([FromRoute]int id)
+        {
+            if (!ConexionOracle.Activa)
+            {
+                ConexionOracle.Open();
+                if (!ConexionOracle.Activa)
+                {
+                    return StatusCode(504, ConexionOracle.NoConResponse);
+                }
+            }
+            try
+            {
+                List<Mantencion> m = await cmd.Find<Mantencion>("Id_depto",id);
+                if (m.Count > 0)
+                {
+                    return Ok(m);
+                }
+                return BadRequest(MensajeError.Nuevo("El departamento no tiene mantenciones asociadas."));
+            }
+            catch(Exception e)
+            {
+                return StatusCode(500, MensajeError.Nuevo(e.Message));
+            }
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> Get([FromRoute]int id)
         {
@@ -46,12 +79,19 @@ namespace API_TurismoReal.Controllers
                     return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
-            Mantencion m = await cmd.Get<Mantencion>(id);
-            if (m != null)
+            try
             {
-                return Ok(m);
+                Mantencion m = await cmd.Get<Mantencion>(id);
+                if (m != null)
+                {
+                    return Ok(m);
+                }
+                return BadRequest();
             }
-            return BadRequest();
+            catch(Exception e)
+            {
+                return StatusCode(500, MensajeError.Nuevo(e.Message));
+            }
         }
         [Authorize(Roles = "1")]
         [HttpPost]
@@ -65,11 +105,18 @@ namespace API_TurismoReal.Controllers
                     return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
-            if (await cmd.Insert(m))
+            try
             {
-                return Ok();
+                if (await cmd.Insert(m))
+                {
+                    return Ok();
+                }
+                return BadRequest();
             }
-            return BadRequest();
+            catch(Exception e)
+            {
+                return StatusCode(500, MensajeError.Nuevo(e.Message));
+            }
         }
         [Authorize(Roles = "1")]
         [HttpPatch]
@@ -83,11 +130,18 @@ namespace API_TurismoReal.Controllers
                     return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
-            if (await cmd.Update(m))
+            try
             {
-                return Ok();
+                if (await cmd.Update(m))
+                {
+                    return Ok();
+                }
+                return BadRequest();
             }
-            return BadRequest();
+            catch(Exception e)
+            {
+                return StatusCode(500, MensajeError.Nuevo(e.Message));
+            }
         }
         [Authorize(Roles = "1")]
         [HttpDelete]
@@ -101,11 +155,18 @@ namespace API_TurismoReal.Controllers
                     return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
-            if (await cmd.Delete(m))
+            try
             {
-                return Ok();
+                if (await cmd.Delete(m))
+                {
+                    return Ok();
+                }
+                return BadRequest();
             }
-            return BadRequest();
+            catch(Exception e)
+            {
+                return StatusCode(500, MensajeError.Nuevo(e.Message));
+            }
         }
     }
 }

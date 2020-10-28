@@ -20,15 +20,46 @@ namespace API_TurismoReal.Controllers
         [HttpPost("enviarcorreo/{correo}")]
         public async Task<IActionResult> EnviarCorreo([FromRoute]String correo)
         {//ESTE METODO ESTA CONFIGURADO PARA SER DE PRUEBAS, CORREGIR MAS ADELANTE
-            var m = Mensajes.ActivacionCuenta;
+            var m = Mensajes.RecuperarClave;
             m.AgregarDestinatario(correo);
             m.ConfigurarAsunto("rol", "admin");
             m.ConfigurarMensaje("rol", "admin");
             m.ConfigurarMensaje("usuario", "jacuna");
-            m.ConfigurarMensaje("codigo", "cod432jkgfdigo");
-            m.ConfigurarMensaje("salt", "valeporsalt");
+            m.ConfigurarMensaje("codigo", "AvWiiSmiyEsYhovHTyMC");
+            m.ConfigurarMensaje("salt", Tools.EncriptarUrlCompatible("jacuna" + "AvWiiSmiyEsYhovHTyMC"));
+            m.ConfigurarMensaje("fecha", DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToShortTimeString());
             var r = ClienteSmtp.Enviar(m);
             return Ok(new { Correo = correo, Resultado = r});
+        }
+
+        [HttpGet("recuperar/{email}")]
+        public async Task<IActionResult> Recuperar([FromRoute]String email)
+        {
+            var lista = await cmd.Find<Persona>("Email", email);
+            if (lista.Count <= 0)
+            {
+                return BadRequest();
+            }
+            var p = lista[0];
+            var u = (await cmd.Find<Usuario>("Rut", p.Rut))[0];
+            var m = Mensajes.RecuperarClave;
+            var reset = new ClaveReset
+            {
+                Codigo = Tools.CodigoAleatorio(p.Rut, 20),
+                Fecha = DateTime.Now,
+                Vencimiento = DateTime.Now.AddDays(1),
+                Canjeado = '0',
+                Username = u.Username
+            };
+            cmd.Insert(reset);
+            String salt = Tools.EncriptarUrlCompatible(u.Username + reset.Codigo);
+            m.AgregarDestinatario(p.Email,p.Nombres+" "+p.Apellidos);
+            m.ConfigurarMensaje("username", u.Username);
+            m.ConfigurarMensaje("codigo", reset.Codigo);
+            m.ConfigurarMensaje("salt", salt);
+            m.ConfigurarMensaje("fecha", reset.Fecha.ToShortDateString()+" "+reset.Fecha.ToShortTimeString());
+            ClienteSmtp.Enviar(m);
+            return Ok();
         }
 
         [HttpGet("restablecer/{username}/{codigo}.{salt}")]
@@ -48,17 +79,19 @@ namespace API_TurismoReal.Controllers
             }
             if (!encontrado)
             {
-                return NotFound();
+                return NotFound("No existe");
             }
             if (reset.Canjeado == '1')
             {
-                NotFound();
+                NotFound("ya se canjeo");
             }
             String sal = Tools.EncriptarUrlCompatible(username+codigo);
             if (!sal.Equals(salt))
             {
-                NotFound();
+                NotFound("sal invalida");
             }
+            reset.Canjeado = '1';
+            cmd.Update(reset);
             Usuario u = await cmd.Get<Usuario>(username);
             Persona p = await cmd.Get<Persona>(u.Rut);
             return Ok(Tools.GenerarToken(u, p));

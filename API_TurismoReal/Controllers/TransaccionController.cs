@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using API_TurismoReal.Conexiones;
+using API_TurismoReal.KhipuApiClient;
 using API_TurismoReal.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -54,7 +55,7 @@ namespace API_TurismoReal.Controllers
             }
             return BadRequest();
         }
-        [Authorize(Roles = "1,5")]
+        //[Authorize(Roles = "1,5")]
         [HttpPost]
         public async Task<IActionResult> Post([FromBody]Transaccion t)
         {
@@ -66,11 +67,23 @@ namespace API_TurismoReal.Controllers
                     return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
-            if (await cmd.Insert(t))
+            try
             {
-                return Ok();
+                /* ZONA KHIPU */
+                var pago = await KhipuClient.Peticiones.Pay(t.Comentario,"CLP",t.Monto);
+                return Ok(pago);
+
+                /**/
+                /*if (await cmd.Insert(t))
+                {
+                    return Ok();
+                }
+                return BadRequest();*/
             }
-            return BadRequest();
+            catch(Exception e)
+            {
+                return StatusCode(500, MensajeError.Nuevo(e.Message));
+            }
         }
         [Authorize(Roles = "1")]
         [HttpPatch]
