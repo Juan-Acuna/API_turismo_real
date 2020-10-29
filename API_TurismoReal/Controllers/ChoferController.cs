@@ -81,6 +81,28 @@ namespace API_TurismoReal.Controllers
             }
             Chofer chofer = creador.Chofer;
             Persona persona = creador.Persona;
+            String n = "";
+            foreach (var l in persona.Nombres.Split(' '))
+            {
+                n += " " + Tools.Capitalize(l);
+            }
+            n = n.TrimStart();
+            persona.Nombres = n;
+            n = "";
+            foreach (var l in persona.Apellidos.Split(' '))
+            {
+                n += " " + Tools.Capitalize(l);
+            }
+            n = n.TrimStart();
+            persona.Apellidos = n;
+            n = "";
+            foreach (var l in persona.Direccion.Split(' '))
+            {
+                n += " " + Tools.Capitalize(l);
+            }
+            n = n.TrimStart();
+            persona.Direccion = n;
+            persona.Email = persona.Email.ToLower();
             chofer.Rut = persona.Rut;
             if (await cmd.Insert(persona, false))
             {
@@ -108,15 +130,27 @@ namespace API_TurismoReal.Controllers
 
             if (data.Persona.Nombres != null)
             {
-                p.Nombres = data.Persona.Nombres;
+                String n = "";
+                foreach (var l in data.Persona.Nombres.Split(' '))
+                {
+                    n += " " + Tools.Capitalize(l);
+                }
+                n = n.TrimStart();
+                p.Nombres = n;
             }
             if (data.Persona.Apellidos != null)
             {
-                p.Apellidos = data.Persona.Apellidos;
+                String n = "";
+                foreach (var l in data.Persona.Apellidos.Split(' '))
+                {
+                    n += " " + Tools.Capitalize(l);
+                }
+                n = n.TrimStart();
+                p.Apellidos = n;
             }
             if (data.Persona.Email != null)
             {
-                p.Email = data.Persona.Email;
+                p.Email = data.Persona.Email.ToLower();
             }
             if (data.Persona.Telefono != null)
             {
@@ -124,7 +158,13 @@ namespace API_TurismoReal.Controllers
             }
             if (data.Persona.Direccion != null)
             {
-                p.Direccion = data.Persona.Direccion;
+                String n = "";
+                foreach (var l in data.Persona.Direccion.Split(' '))
+                {
+                    n += " " + Tools.Capitalize(l);
+                }
+                n = n.TrimStart();
+                p.Direccion = n;
             }
             if (data.Persona.Comuna != null)
             {

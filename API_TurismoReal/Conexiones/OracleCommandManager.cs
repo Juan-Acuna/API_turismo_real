@@ -104,7 +104,7 @@ namespace API_TurismoReal.Conexiones
                 dReader.Close();
                 if (obj[0] == null)
                 {
-                    return default(T);
+                    return null;
                 }
                 else
                 {
@@ -138,7 +138,7 @@ namespace API_TurismoReal.Conexiones
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
-                return default(T);
+                return null;
             }
         }
         /// </summary>

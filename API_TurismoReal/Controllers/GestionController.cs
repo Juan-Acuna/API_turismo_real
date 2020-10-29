@@ -35,7 +35,7 @@ namespace API_TurismoReal.Controllers
         [HttpGet("recuperar/{email}")]
         public async Task<IActionResult> Recuperar([FromRoute]String email)
         {
-            var lista = await cmd.Find<Persona>("Email", email);
+            var lista = await cmd.Find<Persona>("Email", email.ToLower());
             if (lista.Count <= 0)
             {
                 return BadRequest();
@@ -66,7 +66,7 @@ namespace API_TurismoReal.Controllers
         public async Task<IActionResult> Restablecer([FromRoute]String username, [FromRoute]String codigo, [FromRoute]String salt)
         {
             ClaveReset reset = new ClaveReset();
-            var rlist = await cmd.Find<ClaveReset>("Username",(String)username);
+            var rlist = await cmd.Find<ClaveReset>("Username",(String)username.ToLower());
             bool encontrado = false;
             foreach (var r in rlist)
             {

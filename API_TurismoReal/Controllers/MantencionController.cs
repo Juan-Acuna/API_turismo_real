@@ -37,7 +37,7 @@ namespace API_TurismoReal.Controllers
                 }
                 return BadRequest();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return StatusCode(500, MensajeError.Nuevo(e.Message));
             }
@@ -55,19 +55,43 @@ namespace API_TurismoReal.Controllers
             }
             try
             {
-                List<Mantencion> m = await cmd.Find<Mantencion>("Id_depto",id);
+                List<Mantencion> m = await cmd.Find<Mantencion>("Id_depto", id);
                 if (m.Count > 0)
                 {
                     return Ok(m);
                 }
                 return BadRequest(MensajeError.Nuevo("El departamento no tiene mantenciones asociadas."));
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return StatusCode(500, MensajeError.Nuevo(e.Message));
             }
         }
-
+        [HttpGet("funcionario/{username}")]
+        public async Task<IActionResult> FindFuncionario([FromRoute]String username)
+        {
+            if (!ConexionOracle.Activa)
+            {
+                ConexionOracle.Open();
+                if (!ConexionOracle.Activa)
+                {
+                    return StatusCode(504, ConexionOracle.NoConResponse);
+                }
+            }
+            try
+            {
+                List<Mantencion> m = await cmd.Find<Mantencion>("Username", username);
+                if (m.Count > 0)
+                {
+                    return Ok(m);
+                }
+                return BadRequest(MensajeError.Nuevo("El Funcionario no tiene mantenciones asociadas."));
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, MensajeError.Nuevo(e.Message));
+            }
+        }
         [HttpGet("{id}")]
         public async Task<IActionResult> Get([FromRoute]int id)
         {
@@ -88,7 +112,7 @@ namespace API_TurismoReal.Controllers
                 }
                 return BadRequest();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return StatusCode(500, MensajeError.Nuevo(e.Message));
             }
@@ -107,20 +131,21 @@ namespace API_TurismoReal.Controllers
             }
             try
             {
+                //if(m.Username==null || m.Username.Equals(""))
                 if (await cmd.Insert(m))
                 {
                     return Ok();
                 }
                 return BadRequest();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return StatusCode(500, MensajeError.Nuevo(e.Message));
             }
         }
         [Authorize(Roles = "1")]
-        [HttpPatch]
-        public async Task<IActionResult> Patch([FromBody]Mantencion m)
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> Patch([FromRoute]int id,[FromBody]dynamic data)
         {
             if (!ConexionOracle.Activa)
             {
@@ -132,6 +157,8 @@ namespace API_TurismoReal.Controllers
             }
             try
             {
+                var m = await cmd.Get<Mantencion>(id);
+
                 if (await cmd.Update(m))
                 {
                     return Ok();

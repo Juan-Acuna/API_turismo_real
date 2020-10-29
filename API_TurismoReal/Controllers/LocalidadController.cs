@@ -29,11 +29,12 @@ namespace API_TurismoReal.Controllers
                     return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
-            var l = await cmd.Find<LocalidadUsuario>("Id_articulo", username);
+            var l = await cmd.Find<LocalidadUsuario>("Username", username.ToLower());
             if (l.Count > 0)
             {
                 var u = await cmd.Get<Usuario>(l[0].Username);
-                return Ok(u);
+                var p = await cmd.Get<Persona>(u.Rut);
+                return Ok(new PersonaUsuario { Usuario = u, Persona = p });
             }
             return BadRequest();
         }
@@ -49,6 +50,7 @@ namespace API_TurismoReal.Controllers
                     return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
+            lu.Username = lu.Username.ToLower();
             if (await cmd.Insert(lu,false))
             {
                 return Ok();
@@ -67,7 +69,7 @@ namespace API_TurismoReal.Controllers
                     return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
-            var lu = (await cmd.Find<LocalidadUsuario>("username", username))[0];
+            var lu = (await cmd.Find<LocalidadUsuario>("username", username.ToLower()))[0];
             if (await cmd.Delete(lu))
             {
                 return Ok();
@@ -151,6 +153,13 @@ namespace API_TurismoReal.Controllers
             }
             try
             {
+                String n = "";
+                foreach (var c in l.Nombre.Split(' '))
+                {
+                    n += " " + Tools.Capitalize(c);
+                }
+                n = n.TrimStart();
+                l.Nombre = n;
                 if (await cmd.Insert(l))
                 {
                     if (!Directory.Exists(Secret.RUTA_RAIZ + "img\\" + Tools.ToUrlCompatible(l.Nombre) + "\\"))
@@ -170,8 +179,8 @@ namespace API_TurismoReal.Controllers
         [ProducesResponseType(typeof(MensajeError), 400)]
         [ProducesResponseType(typeof(MensajeError), 500)]
         [ProducesResponseType(typeof(MensajeError), 504)]
-        [HttpPatch]
-        public async Task<IActionResult> Patch([FromBody]Localidad l)
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> Patch([FromRoute]int id,[FromBody]dynamic data)
         {
             if (!ConexionOracle.Activa)
             {
@@ -183,9 +192,20 @@ namespace API_TurismoReal.Controllers
             }
             try
             {
+                var l = await cmd.Get<Localidad>(id);
+                if (data.Nombre != null)
+                {
+                    String n = "";
+                    foreach (var c in data.Nombre.Split(' '))
+                    {
+                        n += " " + Tools.Capitalize(c);
+                    }
+                    n = n.TrimStart();
+                    l.Nombre = n;
+                }
                 if (await cmd.Update(l))
                 {
-                    return Ok(await cmd.Get<Localidad>(l.Id_localidad));
+                    return Ok(await cmd.Get<Localidad>(id));
                 }
                 return BadRequest(MensajeError.Nuevo("No se pudo actualizar."));
             }catch(Exception e)

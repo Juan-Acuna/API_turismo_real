@@ -24,7 +24,7 @@ namespace API_TurismoReal.Controllers
         public async Task<IActionResult> UsernameDisponible([FromRoute]String username)
         {
             bool d = true;
-            var u = await cmd.Get<Usuario>(username);
+            var u = await cmd.Get<Usuario>(username.ToLower());
             if (u != null)
             {
                 d = false;
@@ -48,7 +48,7 @@ namespace API_TurismoReal.Controllers
             try
             {
                 bool d = true;
-                var u = await cmd.Find<Persona>("email", email);
+                var u = await cmd.Find<Persona>("email", email.ToLower());
                 if (u.Count > 0)
                 {
                     d = false;
@@ -65,8 +65,14 @@ namespace API_TurismoReal.Controllers
         {
             try
             {
+                String n = "";
+                foreach(var l in nombre.Split(' '))
+                {
+                    n += " " + Tools.Capitalize(l);
+                }
+                n = n.TrimStart();
                 bool d = true;
-                var u = await cmd.Find<Localidad>("Nombre", nombre);
+                var u = await cmd.Find<Localidad>("Nombre", n);
                 if (u.Count > 0)
                 {
                     d = false;
@@ -83,9 +89,51 @@ namespace API_TurismoReal.Controllers
         {
             try
             {
+                String n = "";
+                foreach (var l in nombre.Split(' '))
+                {
+                    n += " " + Tools.Capitalize(l);
+                }
+                n = n.TrimStart();
                 bool d = true;
-                var u = await cmd.Find<Departamento>("Nombre", nombre);
+                var u = await cmd.Find<Departamento>("Nombre", n);
                 if (u.Count > 0)
+                {
+                    d = false;
+                }
+                return Ok(new { Disponible = d });
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, new { Error = e.Message });
+            }
+        }
+        [HttpGet("disponible/articulo/{nombre}")]
+        public async Task<IActionResult> ArticuloDisponible([FromRoute]String nombre)
+        {
+            try
+            {
+                bool d = true;
+                var u = await cmd.Find<Articulo>("Nombre", nombre);
+                if (u.Count > 0)
+                {
+                    d = false;
+                }
+                return Ok(new { Disponible = d });
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, new { Error = e.Message });
+            }
+        }
+        [HttpGet("disponible/patente/{patente}")]
+        public async Task<IActionResult> PatenteDisponible([FromRoute]String patente)
+        {
+            try
+            {
+                bool d = true;
+                var u = await cmd.Get<Vehiculo>(patente.ToUpper());
+                if (u!=null)
                 {
                     d = false;
                 }

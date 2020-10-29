@@ -36,8 +36,8 @@ namespace API_TurismoReal.Controllers
             return BadRequest();
         }
         [Authorize(Roles = "1,3,5")]
-        [HttpGet("{id}")]
-        public async Task<IActionResult> Get([FromRoute]int id)
+        [HttpGet("{patente}")]
+        public async Task<IActionResult> Get([FromRoute]String patente)
         {
             if (!ConexionOracle.Activa)
             {
@@ -47,7 +47,7 @@ namespace API_TurismoReal.Controllers
                     return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
-            Vehiculo v = await cmd.Get<Vehiculo>(id);
+            Vehiculo v = await cmd.Get<Vehiculo>(patente);
             if (v != null)
             {
                 return Ok(v);
@@ -66,6 +66,7 @@ namespace API_TurismoReal.Controllers
                     return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
+            v.Patente = v.Patente.ToUpper();
             if (await cmd.Insert(v))
             {
                 return Ok();
@@ -73,8 +74,8 @@ namespace API_TurismoReal.Controllers
             return BadRequest();
         }
         [Authorize(Roles = "1")]
-        [HttpPatch]
-        public async Task<IActionResult> Patch([FromBody]Vehiculo v)
+        [HttpPatch("{patente}")]
+        public async Task<IActionResult> Patch([FromBody]dynamic data,[FromRoute]String patente)
         {
             if (!ConexionOracle.Activa)
             {
@@ -83,6 +84,15 @@ namespace API_TurismoReal.Controllers
                 {
                     return StatusCode(504, ConexionOracle.NoConResponse);
                 }
+            }
+            Vehiculo v = await cmd.Get<Vehiculo>(patente.ToUpper());
+            if (data.Marca != null)
+            {
+                v.Marca = data.Marca;
+            }
+            if (data.Modelo != null)
+            {
+                v.Modelo = data.Modelo;
             }
             if (await cmd.Update(v))
             {
@@ -91,8 +101,8 @@ namespace API_TurismoReal.Controllers
             return BadRequest();
         }
         [Authorize(Roles = "1")]
-        [HttpDelete]
-        public async Task<IActionResult> Delete([FromBody]Vehiculo v)
+        [HttpDelete("{patente}")]
+        public async Task<IActionResult> Delete([FromRoute]String patente)
         {
             if (!ConexionOracle.Activa)
             {
@@ -102,6 +112,7 @@ namespace API_TurismoReal.Controllers
                     return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
+            var v = await cmd.Get<Vehiculo>(patente.ToUpper());
             if (await cmd.Delete(v))
             {
                 return Ok();
