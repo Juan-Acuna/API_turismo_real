@@ -52,7 +52,25 @@ namespace API_TurismoReal.Controllers
             }
             return BadRequest();
         }
-        [Authorize(Roles = "3")]
+        [HttpGet("localidad/{id}")]
+        public async Task<IActionResult> GetDepto([FromRoute]int id)
+        {
+            if (!ConexionOracle.Activa)
+            {
+                ConexionOracle.Open();
+                if (!ConexionOracle.Activa)
+                {
+                    return StatusCode(504, ConexionOracle.NoConResponse);
+                }
+            }
+            var s = await cmd.Find<Servicio>("Id_localidad", id);
+            if (s.Count > 0)
+            {
+                return Ok(s);
+            }
+            return BadRequest();
+        }
+        [Authorize(Roles = "1,3")]
         [HttpPost]
         public async Task<IActionResult> Post([FromBody]Servicio s)
         {
@@ -70,9 +88,9 @@ namespace API_TurismoReal.Controllers
             }
             return BadRequest();
         }
-        [Authorize(Roles = "3")]
-        [HttpPatch]
-        public async Task<IActionResult> Patch([FromBody]Servicio s)
+        [Authorize(Roles = "1,3")]
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> Patch([FromBody]dynamic data, [FromRoute]int id)
         {
             if (!ConexionOracle.Activa)
             {
@@ -81,6 +99,27 @@ namespace API_TurismoReal.Controllers
                 {
                     return StatusCode(504, ConexionOracle.NoConResponse);
                 }
+            }
+            Servicio s = await cmd.Get<Servicio>(id);
+            if (data.Nombre != null)
+            {
+                s.Nombre = data.Nombre;
+            }
+            if (data.Valor != null)
+            {
+                s.Valor = data.Valor;
+            }
+            if (data.Inicio != null)
+            {
+                s.Inicio = data.Inicio;
+            }
+            if (data.Fin != null)
+            {
+                s.Fin = data.Fin;
+            }
+            if (data.Id_localidad != null)
+            {
+                s.Id_localidad = data.Id_localidad;
             }
             if (await cmd.Update(s))
             {
@@ -88,9 +127,9 @@ namespace API_TurismoReal.Controllers
             }
             return BadRequest();
         }
-        [Authorize(Roles = "3")]
-        [HttpDelete]
-        public async Task<IActionResult> Delete([FromBody]Servicio s)
+        [Authorize(Roles = "1,3")]
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete([FromRoute]int id)
         {
             if (!ConexionOracle.Activa)
             {
@@ -100,6 +139,7 @@ namespace API_TurismoReal.Controllers
                     return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
+            var s = await cmd.Get<Servicio>(id);
             if (await cmd.Delete(s))
             {
                 return Ok();

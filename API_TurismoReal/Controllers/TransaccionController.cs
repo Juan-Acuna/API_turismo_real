@@ -49,7 +49,7 @@ namespace API_TurismoReal.Controllers
                             tr.Listo = '1';
                             tr.Token = response.NotificationToken;
                             Reserva r = await cmd.Get<Reserva>(tr.Id_reserva);
-                            r.Valor_pagado += tr.Monto;
+                            r.Valor_pagado += Int32.Parse(tr.Monto.ToString());
                             if (r.Valor_pagado == r.Valor_total)
                             {
                                 r.Id_estado = 3;
