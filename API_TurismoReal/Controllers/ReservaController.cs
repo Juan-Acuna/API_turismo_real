@@ -56,7 +56,7 @@ namespace API_TurismoReal.Controllers
             }
             return BadRequest();
         }
-        [Authorize(Roles = "2,5")]
+        [Authorize(Roles = "1,2,5")]
         [HttpPost]
         public async Task<IActionResult> Post([FromBody]Reserva r)
         {
@@ -72,6 +72,8 @@ namespace API_TurismoReal.Controllers
             p.Parametros.Add("id_reserva", OracleDbType.Int32, ParameterDirection.Output);
             await p.Ejecutar();
             int idf = Convert.ToInt32((decimal)(OracleDecimal)(p.Parametros["id_reserva"].Value));
+            r.Multa_pagado = 0;
+            r.Multa_total = 0;
             r.Id_reserva = idf;
             r.Valor_pagado = 0;
             r.Fecha = DateTime.Now;
@@ -82,7 +84,7 @@ namespace API_TurismoReal.Controllers
             }
             return BadRequest();
         }
-        [Authorize(Roles = "2,4,5")]
+        [Authorize(Roles = "1,2,4,5")]
         [HttpPatch]
         public async Task<IActionResult> Patch([FromBody]dynamic data)
         {
@@ -138,8 +140,8 @@ namespace API_TurismoReal.Controllers
             return BadRequest();
         }
         [Authorize(Roles = "2,5")]
-        [HttpDelete]
-        public async Task<IActionResult> Delete([FromBody]Reserva r)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete([FromRoute]int id)
         {
             if (!ConexionOracle.Activa)
             {
@@ -149,6 +151,7 @@ namespace API_TurismoReal.Controllers
                     return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
+            var r = await cmd.Get<Reserva>(id);
             if (await cmd.Delete(r))
             {
                 return Ok();

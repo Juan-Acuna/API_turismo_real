@@ -55,6 +55,45 @@ namespace API_TurismoReal.Controllers
             }
         }
         [Authorize(Roles = "1,5")]
+        [ProducesResponseType(typeof(List<PersonaAcompanante>), 200)]
+        [ProducesResponseType(typeof(MensajeError), 400)]
+        [ProducesResponseType(typeof(MensajeError), 500)]
+        [ProducesResponseType(typeof(MensajeError), 504)]
+        [HttpGet("usuario/{username}")]
+        public async Task<IActionResult> GetUsuario([FromRoute]String username)
+        {
+            if (!ConexionOracle.Activa)
+            {
+                ConexionOracle.Open();
+                if (!ConexionOracle.Activa)
+                {
+                    return StatusCode(504, ConexionOracle.NoConResponse);
+                }
+            }
+            try
+            {
+                List<Acompanante> acom = await cmd.Find<Acompanante>("username",username);
+                List<PersonaAcompanante> resultado = new List<PersonaAcompanante>();
+                if (acom.Count > 0)
+                {
+                    foreach (var a in acom)
+                    {
+                        Persona p = await cmd.Get<Persona>(a.Rut);
+                        if (p != null)
+                        {
+                            resultado.Add(new PersonaAcompanante { Acompanante = a, Persona = p });
+                        }
+                    }
+                    return Ok(resultado);
+                }
+                return BadRequest(MensajeError.Nuevo("No se encontraron acompañantes."));
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, MensajeError.Nuevo(e.Message));
+            }
+        }
+        [Authorize(Roles = "1,5")]
         [ProducesResponseType(typeof(PersonaAcompanante), 200)]
         [ProducesResponseType(typeof(MensajeError), 400)]
         [ProducesResponseType(typeof(MensajeError), 500)]
@@ -196,8 +235,8 @@ namespace API_TurismoReal.Controllers
         [ProducesResponseType(typeof(MensajeError), 400)]
         [ProducesResponseType(typeof(MensajeError), 500)]
         [ProducesResponseType(typeof(MensajeError), 504)]
-        [HttpDelete]
-        public async Task<IActionResult> Delete([FromBody]Acompanante acom)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete([FromRoute]int id)
         {
             if (!ConexionOracle.Activa)
             {
@@ -209,6 +248,7 @@ namespace API_TurismoReal.Controllers
             }
             try
             {
+                var acom = await cmd.Get<Acompanante>(id);
                 if (await cmd.Delete(acom))
                 {
                     return Ok();

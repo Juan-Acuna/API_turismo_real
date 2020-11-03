@@ -145,7 +145,7 @@ namespace API_TurismoReal.Controllers
                 Configuration.ReceiverId = Secret.T_RESEIVER_ID;
                 Configuration.Secret = Secret.T_SECRET_KEY;
                 PaymentsApi pago = new PaymentsApi();
-                PaymentsCreateResponse response = pago.PaymentsPost(t.Comentario, "CLP", t.Monto,transactionId:trId);
+                PaymentsCreateResponse response = pago.PaymentsPost(t.Comentario, "CLP", t.Monto,transactionId:trId,returnUrl:"http://localhost:81/agencia/vistas/",cancelUrl:"http://localhost:81/agencia/funciones/reservar.php?cancel="+t.Id_reserva.ToString());
                 /**/
                 t.Id_pago = trId;
                 t.Fecha = DateTime.Now;
@@ -154,9 +154,9 @@ namespace API_TurismoReal.Controllers
 
                 if (await cmd.Insert(t,false))
                 {
-                    return Ok();
+                    return Ok(response);
                 }
-                return Ok(response);
+                return BadRequest();
             }
             catch(Exception e)
             {

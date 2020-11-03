@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace API_TurismoReal.Conexiones
 {
-    public class ConexionOracle
+    /*public class ConexionOracle
     {
         //private const String SOURCE = "localhost:1521";//OFFLINE
         private static String SOURCE = Secret.SERVIDOR;//ONLINE
@@ -140,13 +140,13 @@ namespace API_TurismoReal.Conexiones
                 return MensajeError.Nuevo("No se pudo establecer comunicacion con la base de datos");
             }
         }
-    }
-    /*public class ConexionOracle
+    }*/
+    public class ConexionOracle
     {
         //private const String SOURCE = "localhost:1521";//OFFLINE
-        private static String SOURCE = Temp.SERVIDOR;//ONLINE
-        private static String USER = Temp.USUARIO;
-        private static String PASSWD = Temp.CLAVE;
+        private static String SOURCE = Secret.SERVIDOR;//ONLINE
+        private static String USER = Secret.USUARIO;
+        private static String PASSWD = Secret.CLAVE;
         private static String CON_STR = "DATA SOURCE=(DESCRIPTION =(ADDRESS_LIST =(ADDRESS = (PROTOCOL = TCP)(HOST = " + SOURCE + ")(PORT = 1521)))(CONNECT_DATA =(SERVICE_NAME = TREALDB)));USER ID=" + USER + ";PASSWORD="+PASSWD;
         public static OracleConnection _con = new OracleConnection(CON_STR);
         static bool con1 = false;
@@ -178,7 +178,7 @@ namespace API_TurismoReal.Conexiones
         {
             if (activa)
             {
-                con.Close();
+                _con.Close();
                 activa = false;
             }
         }
@@ -188,7 +188,7 @@ namespace API_TurismoReal.Conexiones
             {
                 try
                 {
-                    con.Open();
+                    _con.Open();
                     activa = true;
                 }
                 catch (InvalidOperationException i)
@@ -208,5 +208,5 @@ namespace API_TurismoReal.Conexiones
                 return MensajeError.Nuevo("No se pudo establecer comunicacion con la base de datos");
             }
         }
-    }*/
+    }
 }

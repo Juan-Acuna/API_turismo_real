@@ -144,19 +144,5 @@ namespace API_TurismoReal.Controllers
                 return StatusCode(500, new { Error = e.Message });
             }
         }
-        [HttpPost("switch/{cod}")]
-        public IActionResult Switch([FromRoute]String cod)
-        {
-            if (cod.Equals("codigo-supersecreto"))
-            {
-                return Ok(ConexionOracle.Switch());
-            }
-            return BadRequest();
-        }
-        [HttpGet("origen")]
-        public IActionResult Origen()
-        {
-            return Ok(ConexionOracle.Origen);
-        }
     }
 }
