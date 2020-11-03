@@ -30,7 +30,7 @@ namespace API_TurismoReal.Controllers
         }
 
         [HttpPost("notificar")]
-        public async Task<IActionResult> Notificar([FromBody]dynamic data)
+        public async Task<IActionResult> Notificar([FromQuery]dynamic data)
         {
             String apiVersion = data.apiVersion;
             String notificationToken = data.notificationToken;
