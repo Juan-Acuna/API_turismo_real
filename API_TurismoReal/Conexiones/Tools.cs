@@ -201,6 +201,46 @@ namespace API_TurismoReal.Conexiones
                 {
                     r += 'N';
                 }
+                else if (c == 'á')
+                {
+                    r += 'a';
+                }
+                else if (c == 'Á')
+                {
+                    r += 'A';
+                }
+                else if (c == 'é')
+                {
+                    r += 'e';
+                }
+                else if (c == 'É')
+                {
+                    r += 'E';
+                }
+                else if (c == 'í')
+                {
+                    r += 'i';
+                }
+                else if (c == 'Í')
+                {
+                    r += 'I';
+                }
+                else if (c == 'ó')
+                {
+                    r += 'o';
+                }
+                else if (c == 'Ó')
+                {
+                    r += 'O';
+                }
+                else if (c == 'ú')
+                {
+                    r += 'u';
+                }
+                else if (c == 'Ú')
+                {
+                    r += 'u';
+                }
                 else
                 {
                     r += '_';

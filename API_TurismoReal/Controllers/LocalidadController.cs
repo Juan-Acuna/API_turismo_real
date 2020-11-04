@@ -193,6 +193,7 @@ namespace API_TurismoReal.Controllers
             try
             {
                 var l = await cmd.Get<Localidad>(id);
+                var old = l.Nombre;
                 if (data.Nombre != null)
                 {
                     String n = "";
@@ -205,6 +206,10 @@ namespace API_TurismoReal.Controllers
                 }
                 if (await cmd.Update(l))
                 {
+                    if (!Directory.Exists(Secret.RUTA_RAIZ + "img\\" + Tools.ToUrlCompatible(l.Nombre) + "\\"))
+                    {
+                        Directory.Move(Secret.RUTA_RAIZ + "img\\" + Tools.ToUrlCompatible(old), Secret.RUTA_RAIZ + "img\\" + Tools.ToUrlCompatible(l.Nombre));
+                    }
                     return Ok(await cmd.Get<Localidad>(id));
                 }
                 return BadRequest(MensajeError.Nuevo("No se pudo actualizar."));
