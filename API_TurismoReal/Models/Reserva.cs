@@ -14,6 +14,8 @@ namespace API_TurismoReal.Models
         public String Desc_checkout { get; set; }
         public int Multa_total { get; set; }
         public int Multa_pagado { get; set; }
+        public int pagos { get; set; }
+        public int n_pagos { get; set; }
         public String Username { get; set; }
         public int Id_depto { get; set; }
         public int Id_estado { get; set; }

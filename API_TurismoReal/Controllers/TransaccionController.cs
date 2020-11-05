@@ -54,9 +54,13 @@ namespace API_TurismoReal.Controllers
                             {
                                 r.Id_estado = 3;
                             }
-                            else
+                            else if(r.Valor_pagado==Math.Round((double)(r.Valor_total/2), 0, MidpointRounding.AwayFromZero))
                             {
                                 r.Id_estado = 2;
+                            }
+                            else
+                            {
+                                r.Id_estado = 1;
                             }
                             await cmd.Update(r);
                             var list = await cmd.Find<Reserva>("Username", tr.Username);
@@ -145,7 +149,9 @@ namespace API_TurismoReal.Controllers
                 Configuration.ReceiverId = Secret.T_RESEIVER_ID;
                 Configuration.Secret = Secret.T_SECRET_KEY;
                 PaymentsApi pago = new PaymentsApi();
-                PaymentsCreateResponse response = pago.PaymentsPost(t.Comentario, "CLP", t.Monto,transactionId:trId,returnUrl:"http://localhost:81/agencia/vistas/",cancelUrl:"http://localhost:81/agencia/funciones/reservar.php?cancel="+t.Id_reserva.ToString());
+                PaymentsCreateResponse response = pago.PaymentsPost(t.Comentario, "CLP", t.Monto,transactionId:trId,
+                    returnUrl: ServerURLs.PagarUrl(Acccion.repay,t.Id_reserva,trId,t.Monto),
+                    cancelUrl: ServerURLs.PagarUrl(Acccion.cancel, t.Id_reserva, trId, t.Monto));
                 /**/
                 t.Id_pago = trId;
                 t.Fecha = DateTime.Now;

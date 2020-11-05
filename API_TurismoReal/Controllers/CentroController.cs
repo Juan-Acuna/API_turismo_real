@@ -32,7 +32,7 @@ namespace API_TurismoReal.Controllers
             {
                 return Ok(c);
             }
-            return BadRequest();
+            return BadRequest(c);
         }
         [HttpGet("{id}")]
         public async Task<IActionResult> Get([FromRoute]int id)

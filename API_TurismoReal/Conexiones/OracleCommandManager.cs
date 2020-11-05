@@ -187,21 +187,24 @@ namespace API_TurismoReal.Conexiones
                     t = new T();
                     foreach (var item in m)
                     {
-                        try
-                        {
-                            item.SetValue(t, ob[l]);
-                        }
-                        catch(ArgumentException e)
+                        if(!(ob[l] is DBNull))
                         {
                             try
                             {
-                                Char c = Char.Parse((String)ob[l]);
-                                item.SetValue(t, c);
+                                item.SetValue(t, ob[l]);
                             }
-                            catch (ArgumentException ex)
+                            catch (ArgumentException e)
                             {
-                                bool b = ((String)ob[l]).Equals("1");
-                                item.SetValue(t, b);
+                                try
+                                {
+                                    Char c = Char.Parse((String)ob[l]);
+                                    item.SetValue(t, c);
+                                }
+                                catch (ArgumentException ex)
+                                {
+                                    bool b = ((String)ob[l]).Equals("1");
+                                    item.SetValue(t, b);
+                                }
                             }
                         }
                         l++;
