@@ -175,14 +175,14 @@ namespace API_TurismoReal.Controllers
                 Localidad l = await cmd.Get<Localidad>(d.Id_localidad);
                 String rutaBase = Secret.RUTA_RAIZ;
                 String subruta = "img\\" + Tools.ToUrlCompatible(l.Nombre.ToLower()) + "\\" + Tools.ToUrlCompatible(d.Nombre.ToLower()) + "\\" + Tools.ToUrlCompatible(d.Nombre.Replace(" ", "_")).ToUpper() + "_" + id.ToString() + Path.GetExtension(imagen.FileName);
-                using (var stream = System.IO.File.Create(rutaBase + subruta))
-                {
-                    await imagen.CopyToAsync(stream);
-                }
                 var s = "img\\" + Tools.ToUrlCompatible(l.Nombre.ToLower()) + "\\" + Tools.ToUrlCompatible(d.Nombre.ToLower()) + "\\" + f.Ruta.Split("/").Last();
                 if (System.IO.File.Exists(rutaBase + s))
                 {
                     System.IO.File.Delete(rutaBase + s);
+                }
+                using (var stream = System.IO.File.Create(rutaBase + subruta))
+                {
+                    await imagen.CopyToAsync(stream);
                 }
                 f.Ruta = ("http://turismoreal.xyz/" + subruta).Replace("\\", "/");
                 if(await cmd.Update(f))
