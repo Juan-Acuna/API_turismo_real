@@ -10,6 +10,7 @@ namespace API_TurismoReal.Conexiones
         List<Token> Tokens = new List<Token>();
         public static SesionsManager Sesiones = new SesionsManager();
         public int Activas { get { return Tokens.Count; } }
+        public int ClientesActivos { get { return ContarClientes(); } }
         private SesionsManager(){ }
 
         public Token Registrar(Token token)
@@ -31,15 +32,15 @@ namespace API_TurismoReal.Conexiones
         {
             return Tokens.IndexOf(token);
         }
-        public Token Buscar(Token token)
+        public Token Buscar(Token token, bool noRol = true)
         {
-            if (token.username == null)
+            if ((token.id_rol == 0 && !noRol) && token.username == null)
             {
                 return null;
             }
             foreach (var t in Tokens)
             {
-                if (token.username.Equals(t.username))
+                if ((token.id_rol == t.id_rol || noRol) && token.username == null)
                 {
                     return t;
                 }
@@ -49,6 +50,18 @@ namespace API_TurismoReal.Conexiones
         public bool Registrado(Token token)
         {
             return Buscar(token)!=null;
+        }
+        private int ContarClientes()
+        {
+            var c = 0;
+            foreach(var t in Tokens)
+            {
+                if(Buscar(t,false)!=null)
+                {
+                    c++;
+                }
+            }
+            return c;
         }
     }
 }

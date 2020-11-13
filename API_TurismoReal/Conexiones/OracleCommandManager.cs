@@ -77,9 +77,6 @@ namespace API_TurismoReal.Conexiones
                 return false;
             }
         }
-        /// </summary>
-        /// El metodo Get solicita un parametro "id" de tipo dynamic(puede ser int o String) y devuelve un objeto del tipo especificado segun la id proporcionada.
-        /// </summary>
         public async Task<T> Get<T>(object id) where T : class, new()
         {
             FormatearComando();
@@ -142,9 +139,6 @@ namespace API_TurismoReal.Conexiones
                 return null;
             }
         }
-        /// </summary>
-        /// El metodo GetAll no solicita parametros y devuelve una lista de objetos del tipo especificado (List<T> donde T es el tipo de los objetos).
-        /// </summary>
         public async Task<List<T>> GetAll<T>() where T : class, new()
         {
             String tabla = typeof(T).Name;
@@ -220,9 +214,6 @@ namespace API_TurismoReal.Conexiones
                 return new List<T>();
             }
         }
-        /// </summary>
-        /// El metodo Update solicita un parametro: un objeto del tipo especificado con los valores a actualizar y el identificador. Devuelve un bool indicando si fue posible realizar la acción.
-        /// </summary>
         public async Task<bool> Update<T>(T objeto) where T : class, new()
         {
             String tabla = typeof(T).Name;
@@ -257,9 +248,6 @@ namespace API_TurismoReal.Conexiones
             }
 
         }
-        /// </summary>
-        /// El metodo Delete solicita un parametro: un objeto del tipo especificado con el identificador. Devuelve un bool indicando si fue posible realizar la acción.
-        /// </summary>
         public async Task<bool> Delete<T>(T objeto) where T : class, new()
         {
             String tabla = typeof(T).Name;
@@ -368,7 +356,7 @@ namespace API_TurismoReal.Conexiones
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
-                return null;
+                return new List<T>();
             }
         }
         #endregion

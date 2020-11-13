@@ -131,18 +131,56 @@ namespace API_TurismoReal.Controllers
         [HttpGet("metricas")]
         public async Task<IActionResult> Metricas()
         {
-            var metricas = new ProxyMetricas();
-            var clientes = await cmd.Find<Usuario>("Id_rol",5);
-            var trs = await cmd.Find<Transaccion>("Fecha", Tools.DateToString(DateTime.Now, DateFormat.DayMonthYear) + " or MONTH(Fecha)=MONTH(TO_DATE("+ Tools.DateToString(DateTime.Now, DateFormat.DayMonthYear) + ",'DD/MM/YYY')");
-            var ms = await cmd.Find<Mantencion>("Fecha", Tools.DateToString(DateTime.Now, DateFormat.DayMonthYear) + " or MONTH(Fecha) BETWEEN MONTH(TO_DATE(" + Tools.DateToString(DateTime.Now, DateFormat.DayMonthYear) + ",'DD/MM/YYY') AND MONTH(TO_DATE(" + Tools.DateToString(DateTime.Now.AddMonths(3), DateFormat.DayMonthYear) + ",'DD/MM/YYY')");
-            var rs = await cmd.Find<Reserva>("Inicio_estadia", Tools.DateToString(DateTime.Now, DateFormat.DayMonthYear) + " or MONTH(Inicio_estadia) BETWEEN MONTH(TO_DATE(" + Tools.DateToString(DateTime.Now, DateFormat.DayMonthYear) + ",'DD/MM/YYY') AND MONTH(TO_DATE(" + Tools.DateToString(DateTime.Now.AddMonths(3), DateFormat.DayMonthYear) + ",'DD/MM/YYY')");
-            metricas.Usuarios = clientes.Count;
-            metricas.Conectados = SesionsManager.Sesiones.Activas;
-            metricas.Transacciones = trs.Count;
-            metricas.Reservas = rs.Count;
-            metricas.Mantenciones = ms.Count;
-            metricas.Departamentos = await cmd.GetAll<Departamento>();
-            return Ok(metricas);
+            try
+            {
+                var metricas = new ProxyMetricas();
+                var clientes = await cmd.Find<Usuario>("Id_rol", 5);
+                var trs = await cmd.GetAll<Transaccion>();
+                var ms = await cmd.GetAll<Mantencion>();
+                var rs = await cmd.GetAll<Reserva>();
+                var cont = 0;
+                foreach(var t in trs)
+                {
+                    if (t.Fecha.Month == DateTime.Now.Month)
+                    {
+                        cont++;
+                    }
+                }
+                metricas.Transacciones = cont;
+                cont = 0;
+                var hoy = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
+                foreach (var m in ms)
+                {
+                    var fecha = new DateTime(DateTime.Now.Year, m.Fecha.Month, DateTime.Now.Day);
+                    if (DateTime.Compare(fecha, hoy) >= 0 && DateTime.Compare(fecha, hoy.AddMonths(3)) <= 0)
+                    {
+                        cont++;
+                    }
+                }
+                metricas.Mantenciones = cont;
+                cont = 0;
+                foreach (var r in rs)
+                {
+                    var fecha = new DateTime(DateTime.Now.Year, r.Inicio_estadia.Month, DateTime.Now.Day);
+                    if (DateTime.Compare(fecha, hoy) >= 0 && DateTime.Compare(fecha, hoy.AddMonths(3)) <= 0)
+                    {
+                        cont++;
+                    }
+                }
+                metricas.Reservas = cont;
+                var deptos = await cmd.GetAll<Departamento>();
+                foreach (var d in deptos)
+                {
+                    metricas.Departamentos[d.Id_estado - 1]++;
+                }
+                metricas.Usuarios = clientes.Count;
+                metricas.Conectados = SesionsManager.Sesiones.ClientesActivos; 
+                return Ok(metricas);
+            }
+            catch(Exception e)
+            {
+                return StatusCode(500, e);
+            }
         }
     }
 }

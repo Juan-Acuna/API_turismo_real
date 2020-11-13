@@ -114,7 +114,7 @@ namespace API_TurismoReal.Conexiones
                claims: claims,
                expires: expiration,
                signingCredentials: creds);
-            return new Token(new JwtSecurityTokenHandler().WriteToken(token), expiration, usuario.Username, persona.Nombres, persona.Apellidos);
+            return new Token(new JwtSecurityTokenHandler().WriteToken(token), expiration, usuario.Username, persona.Nombres, persona.Apellidos, usuario.Id_rol);
         }
         public static string Encriptar(String texto)
         {
@@ -252,18 +252,20 @@ namespace API_TurismoReal.Conexiones
         public String nombres { get; set; }
         public String apellidos { get; set; }
         public String username { get; set; }
+        public int id_rol { get; set; }
 
-        public Token(String token, DateTime expiration, String username, String nombres, String apellidos)
+        public Token(String token, DateTime expiration, String username, String nombres, String apellidos, int rol)
         {
             this.token = token;
             this.expiration = expiration;
             this.username = username;
             this.apellidos = apellidos;
             this.nombres = nombres;
+            this.id_rol = rol;
         }
         public Token Clonar()
         {
-            return new Token(this.token, expiration, username, nombres, apellidos);
+            return new Token(this.token, expiration, username, nombres, apellidos, id_rol);
         }
     }
     public class ResponseJson
