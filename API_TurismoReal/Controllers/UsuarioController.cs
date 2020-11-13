@@ -58,7 +58,7 @@ namespace API_TurismoReal.Controllers
                                 return StatusCode(401, new { Error="Acceso Denegado."});
                             }
                         }
-                        return Ok(Tools.GenerarToken(usuario,persona));
+                        return Ok(SesionsManager.Sesiones.Registrar(Tools.GenerarToken(usuario,persona)));
                     default:
                         return StatusCode(502);
                 }

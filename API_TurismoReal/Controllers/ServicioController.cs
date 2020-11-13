@@ -88,6 +88,28 @@ namespace API_TurismoReal.Controllers
             }
             return BadRequest();
         }
+        //[Authorize(Roles = "1,3,5")]
+        [HttpPost("contratar/{r}.{s}")]
+        public async Task<IActionResult> Contratar([FromRoute]int r, [FromRoute]int s)
+        {
+            if (!ConexionOracle.Activa)
+            {
+                ConexionOracle.Open();
+                if (!ConexionOracle.Activa)
+                {
+                    return StatusCode(504, ConexionOracle.NoConResponse);
+                }
+            }
+            ReservaServicio rs = new ReservaServicio
+            {
+                Id_reserva=r,Id_servicio=s
+            };
+            if (await cmd.Insert(rs,false))
+            {
+                return Ok();
+            }
+            return BadRequest();
+        }
         [Authorize(Roles = "1,3")]
         [HttpPatch("{id}")]
         public async Task<IActionResult> Patch([FromBody]dynamic data, [FromRoute]int id)

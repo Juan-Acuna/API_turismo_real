@@ -113,24 +113,25 @@ namespace API_TurismoReal.Conexiones
                     int l = 0;
                     foreach (var item in m)
                     {
-                        try
-                        {
-                            item.SetValue(t, obj[l]);
-                            l++;
-                        }
-                        catch (ArgumentException e)
+                        if (!(obj[l] is DBNull))
                         {
                             try
                             {
-                                item.SetValue(t, Convert.ToChar(obj[l]));
-                                l++;
+                                item.SetValue(t, obj[l]);
                             }
-                            catch(OverflowException ex)
+                            catch (ArgumentException e)
                             {
-                                item.SetValue(t, Convert.ToInt32(obj[l]));
-                                l++;
+                                try
+                                {
+                                    item.SetValue(t, Convert.ToChar(obj[l]));
+                                }
+                                catch (OverflowException ex)
+                                {
+                                    item.SetValue(t, Convert.ToInt32(obj[l]));
+                                }
                             }
                         }
+                        l++;
                     }
                     return t;
                 }
@@ -338,21 +339,24 @@ namespace API_TurismoReal.Conexiones
                     t = new T();
                     foreach (var item in m)
                     {
-                        try
-                        {
-                            item.SetValue(t, ob[l]);
-                        }
-                        catch (ArgumentException e)
+                        if (!(ob[l] is DBNull))
                         {
                             try
                             {
-                                Char c = Char.Parse((String)ob[l]);
-                                item.SetValue(t, c);
+                                item.SetValue(t, ob[l]);
                             }
-                            catch (ArgumentException ex)
+                            catch (ArgumentException e)
                             {
-                                bool b = ((String)ob[l]).Equals("1");
-                                item.SetValue(t, b);
+                                try
+                                {
+                                    Char c = Char.Parse((String)ob[l]);
+                                    item.SetValue(t, c);
+                                }
+                                catch (ArgumentException ex)
+                                {
+                                    bool b = ((String)ob[l]).Equals("1");
+                                    item.SetValue(t, b);
+                                }
                             }
                         }
                         l++;
@@ -470,38 +474,5 @@ namespace API_TurismoReal.Conexiones
                 return field + "=" + idValue.ToString();
             }
         }
-    }
-    public class Token
-    {
-        public String token { get; set; }
-        public DateTime expiration { get; set; }
-        public String nombres { get; set; }
-        public String apellidos { get; set; }
-        public String username { get; set; }
-
-        public Token(String token, DateTime expiration,String username, String nombres, String apellidos)
-        {
-            this.token = token;
-            this.expiration = expiration;
-            this.username = username;
-            this.apellidos = apellidos;
-            this.nombres = nombres;
-        }
-    }
-    public class ResponseJson
-    {
-        public Object Contenido { get; set; }
-        public bool Resultado { get; set; }
-        public ResponseJson(Object contenido, bool resultado = false)
-        {
-            this.Resultado = resultado;
-            this.Contenido = contenido;
-        }
-    }
-    public enum DateFormat
-    {
-        YearMonthDay,
-        DayMonthYear,
-        MonthDayYear
     }
 }

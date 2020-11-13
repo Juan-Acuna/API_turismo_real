@@ -127,5 +127,22 @@ namespace API_TurismoReal.Controllers
             }
             return Ok();
         }
+        [Authorize(Roles = "1")]
+        [HttpGet("metricas")]
+        public async Task<IActionResult> Metricas()
+        {
+            var metricas = new ProxyMetricas();
+            var clientes = await cmd.Find<Usuario>("Id_rol",5);
+            var trs = await cmd.Find<Transaccion>("Fecha", Tools.DateToString(DateTime.Now, DateFormat.DayMonthYear) + " or MONTH(Fecha)=MONTH(TO_DATE("+ Tools.DateToString(DateTime.Now, DateFormat.DayMonthYear) + ",'DD/MM/YYY')");
+            var ms = await cmd.Find<Mantencion>("Fecha", Tools.DateToString(DateTime.Now, DateFormat.DayMonthYear) + " or MONTH(Fecha) BETWEEN MONTH(TO_DATE(" + Tools.DateToString(DateTime.Now, DateFormat.DayMonthYear) + ",'DD/MM/YYY') AND MONTH(TO_DATE(" + Tools.DateToString(DateTime.Now.AddMonths(3), DateFormat.DayMonthYear) + ",'DD/MM/YYY')");
+            var rs = await cmd.Find<Reserva>("Inicio_estadia", Tools.DateToString(DateTime.Now, DateFormat.DayMonthYear) + " or MONTH(Inicio_estadia) BETWEEN MONTH(TO_DATE(" + Tools.DateToString(DateTime.Now, DateFormat.DayMonthYear) + ",'DD/MM/YYY') AND MONTH(TO_DATE(" + Tools.DateToString(DateTime.Now.AddMonths(3), DateFormat.DayMonthYear) + ",'DD/MM/YYY')");
+            metricas.Usuarios = clientes.Count;
+            metricas.Conectados = SesionsManager.Sesiones.Activas;
+            metricas.Transacciones = trs.Count;
+            metricas.Reservas = rs.Count;
+            metricas.Mantenciones = ms.Count;
+            metricas.Departamentos = await cmd.GetAll<Departamento>();
+            return Ok(metricas);
+        }
     }
 }

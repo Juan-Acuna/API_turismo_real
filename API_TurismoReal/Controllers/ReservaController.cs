@@ -38,6 +38,25 @@ namespace API_TurismoReal.Controllers
             return BadRequest();
         }
         [Authorize]
+        [HttpGet("usuario/{username}")]
+        public async Task<IActionResult> Usuario([FromRoute]String username)
+        {
+            if (!ConexionOracle.Activa)
+            {
+                ConexionOracle.Open();
+                if (!ConexionOracle.Activa)
+                {
+                    return StatusCode(504, ConexionOracle.NoConResponse);
+                }
+            }
+            var s = await cmd.Find<Reserva>("Username", username);
+            if (s.Count > 0)
+            {
+                return Ok(s);
+            }
+            return BadRequest();
+        }
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> Get([FromRoute]int id)
         {

@@ -116,24 +116,20 @@ namespace API_TurismoReal.Conexiones
                signingCredentials: creds);
             return new Token(new JwtSecurityTokenHandler().WriteToken(token), expiration, usuario.Username, persona.Nombres, persona.Apellidos);
         }
-
         public static string Encriptar(String texto)
         {
             return new ASCIIEncoding()
                 .GetString(new SHA1CryptoServiceProvider()
                 .ComputeHash(Encoding.UTF8.GetBytes(texto)));
         }
-
         public static String UrlEncode(String texto)
         {
             return HttpUtility.UrlEncode(texto);
         }
-
         public static String UrlDecode(String texto)
         {
             return HttpUtility.UrlDecode(texto);
         }
-
         public static String EncriptarHmacSHA256(string secret, string data)
         {
             using (HMACSHA256 hmac = new HMACSHA256(Encoding.UTF8.GetBytes(secret)))
@@ -248,5 +244,42 @@ namespace API_TurismoReal.Conexiones
             }
             return r.ToLower();
         }
+    }
+    public class Token
+    {
+        public String token { get; set; }
+        public DateTime expiration { get; set; }
+        public String nombres { get; set; }
+        public String apellidos { get; set; }
+        public String username { get; set; }
+
+        public Token(String token, DateTime expiration, String username, String nombres, String apellidos)
+        {
+            this.token = token;
+            this.expiration = expiration;
+            this.username = username;
+            this.apellidos = apellidos;
+            this.nombres = nombres;
+        }
+        public Token Clonar()
+        {
+            return new Token(this.token, expiration, username, nombres, apellidos);
+        }
+    }
+    public class ResponseJson
+    {
+        public Object Contenido { get; set; }
+        public bool Resultado { get; set; }
+        public ResponseJson(Object contenido, bool resultado = false)
+        {
+            this.Resultado = resultado;
+            this.Contenido = contenido;
+        }
+    }
+    public enum DateFormat
+    {
+        YearMonthDay,
+        DayMonthYear,
+        MonthDayYear
     }
 }
