@@ -9,8 +9,12 @@ namespace API_TurismoReal.Conexiones
     {
         List<Token> Tokens = new List<Token>();
         public static SesionsManager Sesiones = new SesionsManager();
-        public int Activas { get { return Tokens.Count; } }
-        public int ClientesActivos { get { return ContarClientes(); } }
+        public int Activas { get { return ValidarPorExpiracion(); } }
+        public int AdminActivos { get { return ContarPorRol(1); } }
+        public int GestResActivos { get { return ContarPorRol(2); } }
+        public int GestServActivos { get { return ContarPorRol(3); } }
+        public int FuncActivos { get { return ContarPorRol(4); } }
+        public int ClientesActivos { get { return ContarPorRol(5); } }
         private SesionsManager(){ }
 
         public Token Registrar(Token token)
@@ -30,17 +34,19 @@ namespace API_TurismoReal.Conexiones
         }
         public int IndexOf(Token token)
         {
+            ValidarPorExpiracion();
             return Tokens.IndexOf(token);
         }
         public Token Buscar(Token token, bool noRol = true)
         {
+            ValidarPorExpiracion();
             if ((token.id_rol == 0 && !noRol) && token.username == null)
             {
                 return null;
             }
             foreach (var t in Tokens)
             {
-                if ((token.id_rol == t.id_rol || noRol) && token.username == null)
+                if ((token.id_rol == t.id_rol || noRol) && token.username.Equals(t.username))
                 {
                     return t;
                 }
@@ -51,17 +57,30 @@ namespace API_TurismoReal.Conexiones
         {
             return Buscar(token)!=null;
         }
-        private int ContarClientes()
+        private int ContarPorRol(int r)
         {
+            ValidarPorExpiracion();
             var c = 0;
             foreach(var t in Tokens)
             {
-                if(Buscar(t,false)!=null)
+                
+                if(t.id_rol==r)
                 {
                     c++;
                 }
             }
             return c;
+        }
+        private int ValidarPorExpiracion()
+        {
+            foreach(var t in Tokens)
+            {
+                if (DateTime.Compare(t.expiration, DateTime.Now) <= 0)
+                {
+                    Eliminar(t);
+                }
+            }
+            return Tokens.Count;
         }
     }
 }

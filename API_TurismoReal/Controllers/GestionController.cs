@@ -134,7 +134,7 @@ namespace API_TurismoReal.Controllers
             try
             {
                 var metricas = new ProxyMetricas();
-                var clientes = await cmd.Find<Usuario>("Id_rol", 5);
+                var us = await cmd.GetAll<Usuario>();
                 var trs = await cmd.GetAll<Transaccion>();
                 var ms = await cmd.GetAll<Mantencion>();
                 var rs = await cmd.GetAll<Reserva>();
@@ -173,8 +173,16 @@ namespace API_TurismoReal.Controllers
                 {
                     metricas.Departamentos[d.Id_estado - 1]++;
                 }
-                metricas.Usuarios = clientes.Count;
-                metricas.Conectados = SesionsManager.Sesiones.ClientesActivos; 
+                foreach (var u in us)
+                {
+                    metricas.Usuarios[u.Id_rol - 1]++;
+                }
+                //metricas.Usuarios[0] = 
+                metricas.Conectados[0] = SesionsManager.Sesiones.AdminActivos; 
+                metricas.Conectados[1] = SesionsManager.Sesiones.GestResActivos;
+                metricas.Conectados[2] = SesionsManager.Sesiones.GestServActivos; 
+                metricas.Conectados[3] = SesionsManager.Sesiones.FuncActivos; 
+                metricas.Conectados[4] = SesionsManager.Sesiones.ClientesActivos; 
                 return Ok(metricas);
             }
             catch(Exception e)
