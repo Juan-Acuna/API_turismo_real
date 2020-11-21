@@ -18,7 +18,7 @@ namespace API_TurismoReal.Controllers
         OracleCommandManager cmd = new OracleCommandManager(ConexionOracle.Conexion);
         //[Authorize]
         [HttpPost("enviarcorreo/{correo}")]
-        public async Task<IActionResult> EnviarCorreo([FromRoute]String correo)
+        public IActionResult EnviarCorreo([FromRoute]String correo)
         {//ESTE METODO ESTA CONFIGURADO PARA SER DE PRUEBAS, CORREGIR MAS ADELANTE
             var m = Mensajes.RecuperarClave;
             m.AgregarDestinatario(correo);
@@ -186,6 +186,29 @@ namespace API_TurismoReal.Controllers
                 return Ok(metricas);
             }
             catch(Exception e)
+            {
+                return StatusCode(500, e);
+            }
+        }
+        //[Authorize(Roles = "1")]
+        [HttpGet("informe")]
+        public async Task<IActionResult> GenerarInforme()
+        {
+            int mes = 11;
+            int ano = 2020;
+            try
+            {
+                Informe informe = new Informe(mes,ano);
+                var deptos = await cmd.GetAll<Departamento>();
+                var servicios = await cmd.GetAll<Servicio>();
+                var reservas = await cmd.GetAll<Reserva>();
+                var res_ser = await cmd.GetAll<ReservaServicio>();
+                informe.CargarDeptos(deptos);
+                informe.CargarServicios(servicios);
+                informe.Procesar(reservas, res_ser);
+                return Ok(informe);
+            }
+            catch (Exception e)
             {
                 return StatusCode(500, e);
             }
