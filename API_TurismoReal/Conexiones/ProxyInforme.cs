@@ -99,7 +99,7 @@ namespace API_TurismoReal.Conexiones
                 Ingresos.Add(new IngresoServicio("[" + s.Id_servicio.ToString() + "]" + s.Nombre,s.Valor));
             }
         }
-        public void Procesar(List<Reserva> reservas, List<ReservaServicio> rservicios)
+        public void Procesar(List<Reserva> reservas, List<ReservaServicio> rservicios, List<Mantencion> mantenciones, List<TipoMantencion> tipos)
         {
             List<Reserva> rs = new List<Reserva>();
             List<ReservaServicio> sers = new List<ReservaServicio>();
@@ -148,6 +148,19 @@ namespace API_TurismoReal.Conexiones
                 }
                 Ingresos.IngresosServicio[i].CalcularTotales();
             }
+            //mantenciones
+            for(int i = 0; i < Egresos.EgresosDepto.Count; i++)
+            {
+                foreach(var m in mantenciones)
+                {
+                    if(m.Id_depto == Int32.Parse(Egresos.EgresosDepto[i].Depto.Split("]")[0].Replace("[", "")))
+                    {
+                        Egresos.EgresosDepto[i].Mantenciones += Tools.BuscarEnLista(tipos,"Id_tipo",m.Id_tipo).Valor;
+                    }
+                }
+                Egresos.EgresosDepto[i].CalcularTotales();
+            }
+            //utilidades
             for(int i = 0; i < Egresos.EgresosDepto.Count; i++)
             {
                 Utilidades.Utilidades.Add(new Utilidad(Ingresos.IngresosReserva[i], Egresos.EgresosDepto[i]));
@@ -238,6 +251,8 @@ namespace API_TurismoReal.Conexiones
         public long Ganancias { get; private set; }
         public IngresoReserva(String depto, int costoDia)
         {
+            Reservas = 0;
+            DiasTotales = 0;
             Depto = depto;
             CostoDia = costoDia;
         }
@@ -256,6 +271,7 @@ namespace API_TurismoReal.Conexiones
         public long Ganancias { get; private set; }
         public IngresoServicio(String servicio, int costo)
         {
+            Contrataciones = 0;
             Servicio = servicio;
             CostoContratacion = costo;
         }
@@ -271,18 +287,19 @@ namespace API_TurismoReal.Conexiones
         public String Depto { get; private set; }
         public int Dividendo { get; private set; }
         public int Contribuciones { get; private set; }
+        public long Mantenciones { get; set; }
         public long GastoTotal { get; private set; }
         public EgresoDepto(String depto, int dividendo, int contribuciones)
         {
+            Mantenciones = 0;
             Depto = depto;
             Dividendo = dividendo;
             Contribuciones = contribuciones;
-            CalcularTotales();
         }
 
         public override long CalcularTotales()
         {
-            GastoTotal = Dividendo + Contribuciones;
+            GastoTotal = Dividendo + Contribuciones + Mantenciones;
             return GastoTotal;
         }
     }

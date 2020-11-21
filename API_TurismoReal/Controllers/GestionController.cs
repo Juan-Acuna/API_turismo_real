@@ -190,22 +190,22 @@ namespace API_TurismoReal.Controllers
                 return StatusCode(500, e);
             }
         }
-        //[Authorize(Roles = "1")]
-        [HttpGet("informe")]
-        public async Task<IActionResult> GenerarInforme()
+        [Authorize(Roles = "1")]
+        [HttpGet("informe/{mes}${ano}")]
+        public async Task<IActionResult> GenerarInforme([FromRoute]int mes, [FromRoute]int ano)
         {
-            int mes = 11;
-            int ano = 2020;
             try
             {
                 Informe informe = new Informe(mes,ano);
                 var deptos = await cmd.GetAll<Departamento>();
                 var servicios = await cmd.GetAll<Servicio>();
+                var mantenciones = await cmd.GetAll<Mantencion>();
+                var tman = await cmd.GetAll<TipoMantencion>();
                 var reservas = await cmd.GetAll<Reserva>();
                 var res_ser = await cmd.GetAll<ReservaServicio>();
                 informe.CargarDeptos(deptos);
                 informe.CargarServicios(servicios);
-                informe.Procesar(reservas, res_ser);
+                informe.Procesar(reservas, res_ser, mantenciones, tman);
                 return Ok(informe);
             }
             catch (Exception e)

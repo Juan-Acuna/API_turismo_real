@@ -244,6 +244,32 @@ namespace API_TurismoReal.Conexiones
             }
             return r.ToLower();
         }
+        public static T BuscarEnLista<T>(List<T> lista, String campo, object valor) where T : class
+        {
+            if (valor == null)
+            {
+                return null;
+            }
+            var mem = typeof(T).GetProperties();
+            if (lista == null)
+            {
+                return default(T);
+            }
+            foreach (var item in lista)
+            {
+                foreach (var m in mem)
+                {
+                    if (m.Name.Equals(campo))
+                    {
+                        if (valor.Equals(m.GetValue(item)))
+                        {
+                            return item;
+                        }
+                    }
+                }
+            }
+            return null;
+        }
     }
     public class Token
     {
