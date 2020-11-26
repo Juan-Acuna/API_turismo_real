@@ -67,7 +67,7 @@ namespace API_TurismoReal.Controllers
                 }
             }
             v.Patente = v.Patente.ToUpper();
-            if (await cmd.Insert(v))
+            if (await cmd.Insert(v,false))
             {
                 return Ok();
             }

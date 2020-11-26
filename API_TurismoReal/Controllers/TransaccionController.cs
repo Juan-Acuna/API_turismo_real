@@ -170,7 +170,7 @@ namespace API_TurismoReal.Controllers
                         return BadRequest(MensajeError.Nuevo("Reserva no existe."));
                     }
                     r.Valor_pagado += Convert.ToInt32(t.Monto);
-                    r.n_pagos = r.n_pagos + 1;
+                    r.N_pago = r.N_pago + 1;
                     if (r.Valor_pagado == r.Valor_total)
                     {
                         r.Id_estado = 3;

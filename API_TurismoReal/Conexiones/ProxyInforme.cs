@@ -17,9 +17,9 @@ namespace API_TurismoReal.Conexiones
 
     public class Informe
     {
-        String mes = String.Empty;
+        public String mes { get; private set; }
         int numMes;
-        int ano;
+        public int ano { get; private set; }
         public ProxyIngresos Ingresos { get; private set; }
         public ProxyEgresos Egresos { get; private set; }
         public ProxyUtilidades Utilidades { get; private set; }

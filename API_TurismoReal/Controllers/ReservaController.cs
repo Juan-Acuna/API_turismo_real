@@ -19,6 +19,85 @@ namespace API_TurismoReal.Controllers
     {
         OracleCommandManager cmd = new OracleCommandManager(ConexionOracle.Conexion);
         [Authorize]
+        [HttpPost("iniciarcheck/{id}/{desc}")]
+        public async Task<IActionResult> IniciarCheck([FromRoute]int id,[FromRoute]String desc)
+        {
+            if (!ConexionOracle.Activa)
+            {
+                ConexionOracle.Open();
+                if (!ConexionOracle.Activa)
+                {
+                    return StatusCode(504, ConexionOracle.NoConResponse);
+                }
+            }
+            Reserva r = await cmd.Get<Reserva>(id);
+            if (r != null)
+            {
+                if (r.Checkin == '0')
+                {
+                    //CHECKIN
+                    r.Checkin = '1';
+                    r.Desc_checkin = desc;
+                }
+                else
+                {
+                    if (r.Checkout == '1')
+                    {
+                        return BadRequest();
+                    }
+                    //CHECKOUT
+                    r.Checkout = '1';
+                    r.Desc_checkout = desc;
+                }
+                await cmd.Update(r);
+                return Ok(r);
+            }
+            return BadRequest();
+        }
+        [Authorize]
+        [HttpGet("status/{id}")]
+        public async Task<IActionResult> Status([FromRoute]int id)
+        {
+            if (!ConexionOracle.Activa)
+            {
+                ConexionOracle.Open();
+                if (!ConexionOracle.Activa)
+                {
+                    return StatusCode(504, ConexionOracle.NoConResponse);
+                }
+            }
+            Reserva r = await cmd.Get<Reserva>(id);
+            if (r != null)
+            {
+                return Ok(new { Confirmado = (r.Confirmado=='1') });
+            }
+            return BadRequest();
+        }
+        [Authorize]
+        [HttpPost("iniciarcheck/{id}")]
+        public async Task<IActionResult> ConfirmarCheck([FromRoute]int id)
+        {
+            if (!ConexionOracle.Activa)
+            {
+                ConexionOracle.Open();
+                if (!ConexionOracle.Activa)
+                {
+                    return StatusCode(504, ConexionOracle.NoConResponse);
+                }
+            }
+            Reserva r = await cmd.Get<Reserva>(id);
+            if (r != null)
+            {
+                if (r.Checkin == '1' && r.Confirmado == '0')
+                {
+                    r.Confirmado = '1';
+                    await cmd.Update(r);
+                    return Ok(r);
+                }
+            }
+            return BadRequest();
+        }
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> Get()
         {
@@ -131,6 +210,18 @@ namespace API_TurismoReal.Controllers
             if (data.Fin_estadia != null)
             {
                 r.Fin_estadia = data.Fin_estadia;
+            }
+            if (data.Checkin != null)
+            {
+                r.Checkin = data.Checkin;
+            }
+            if (data.Confirmado != null)
+            {
+                r.Confirmado = data.Confirmado;
+            }
+            if (data.Checkout != null)
+            {
+                r.Checkout = data.Checkout;
             }
             if (data.Desc_checkin != null)
             {

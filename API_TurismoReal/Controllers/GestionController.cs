@@ -213,5 +213,45 @@ namespace API_TurismoReal.Controllers
                 return StatusCode(500, e);
             }
         }
+        [Authorize(Roles = "1")]
+        [HttpGet("informe")]
+        public async Task<IActionResult> GenerarInformes()
+        {
+            try
+            {
+                List<Informe> informes = new List<Informe>();
+                Informe i;
+                var deptos = await cmd.GetAll<Departamento>();
+                var servicios = await cmd.GetAll<Servicio>();
+                var mantenciones = await cmd.GetAll<Mantencion>();
+                var tman = await cmd.GetAll<TipoMantencion>();
+                var reservas = await cmd.GetAll<Reserva>();
+                var res_ser = await cmd.GetAll<ReservaServicio>();
+                int mesInicial = 8;
+                int anoInicial = 2020;
+                int mesActual = DateTime.Now.Month;
+                int anoActual = DateTime.Now.Year;
+                do
+                {
+                    i = new Informe(mesInicial,anoInicial);
+                    i.CargarDeptos(deptos);
+                    i.CargarServicios(servicios);
+                    i.Procesar(reservas, res_ser, mantenciones, tman);
+                    informes.Add(i);
+                    mesInicial++;
+                    if (mesInicial > 12)
+                    {
+                        anoInicial++;
+                        mesInicial = 1;
+                    }
+                } while (mesInicial < mesActual && anoInicial <= anoActual);
+                
+                return Ok(informes);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e);
+            }
+        }
     }
 }
