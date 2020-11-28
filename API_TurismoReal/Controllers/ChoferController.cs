@@ -125,64 +125,72 @@ namespace API_TurismoReal.Controllers
                     return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
-            Chofer c = await cmd.Get<Chofer>(id);
-            Persona p = await cmd.Get<Persona>(c.Rut);
+            try
+            {
+                Chofer c = await cmd.Get<Chofer>(id);
+                Persona p = await cmd.Get<Persona>(c.Rut);
 
-            if (data.Persona.Nombres != null)
-            {
-                String n = "";
-                foreach (var l in data.Persona.Nombres.Split(' '))
+                if (data.Persona.Nombres != null)
                 {
-                    n += " " + Tools.Capitalize(l);
+                    String n = "";
+                    foreach (var l in data.Persona.Nombres.ToString().Split(' '))
+                    {
+                        n += " " + Tools.Capitalize(l);
+                    }
+                    n = n.TrimStart();
+                    p.Nombres = n;
                 }
-                n = n.TrimStart();
-                p.Nombres = n;
-            }
-            if (data.Persona.Apellidos != null)
-            {
-                String n = "";
-                foreach (var l in data.Persona.Apellidos.Split(' '))
+                if (data.Persona.Apellidos != null)
                 {
-                    n += " " + Tools.Capitalize(l);
+                    String n = "";
+                    foreach (var l in data.Persona.Apellidos.ToString().Split(' '))
+                    {
+                        n += " " + Tools.Capitalize(l);
+                    }
+                    n = n.TrimStart();
+                    p.Apellidos = n;
                 }
-                n = n.TrimStart();
-                p.Apellidos = n;
-            }
-            if (data.Persona.Email != null)
-            {
-                p.Email = data.Persona.Email.ToLower();
-            }
-            if (data.Persona.Telefono != null)
-            {
-                p.Telefono = data.Persona.Telefono;
-            }
-            if (data.Persona.Direccion != null)
-            {
-                String n = "";
-                foreach (var l in data.Persona.Direccion.Split(' '))
+                if (data.Persona.Email != null)
                 {
-                    n += " " + Tools.Capitalize(l);
+                    p.Email = data.Persona.Email.ToString().ToLower();
                 }
-                n = n.TrimStart();
-                p.Direccion = n;
+                if (data.Persona.Telefono != null)
+                {
+                    p.Telefono = data.Persona.Telefono;
+                }
+                if (data.Persona.Direccion != null)
+                {
+                    String n = "";
+                    foreach (var l in data.Persona.Direccion.ToString().Split(' '))
+                    {
+                        n += " " + Tools.Capitalize(l);
+                    }
+                    n = n.TrimStart();
+                    p.Direccion = n;
+                }
+                if (data.Persona.Comuna != null)
+                {
+                    p.Comuna = data.Persona.Comuna;
+                }
+                if (data.Persona.Region != null)
+                {
+                    p.Region = data.Persona.Region;
+                }
+                if (data.Persona.Id_genero != null)
+                {
+                    p.Id_genero = data.Persona.Id_genero;
+                }
+                if (await cmd.Update(p))
+                {
+                    return Ok();
+                }
+                return BadRequest();
             }
-            if (data.Persona.Comuna != null)
+            catch(Exception e)
             {
-                p.Comuna = data.Persona.Comuna;
+                return StatusCode(500, e.Message + " | " + e.Source + " | " + e.StackTrace);
             }
-            if (data.Persona.Region != null)
-            {
-                p.Region = data.Persona.Region;
-            }
-            if (data.Persona.Id_genero != null)
-            {
-                p.Id_genero = data.Persona.Id_genero;
-            }
-            if (await cmd.Update(p))
-            {
-                return Ok();
-            }
-            return BadRequest();
+            
         }
         [Authorize(Roles = "1")]
         [HttpDelete]

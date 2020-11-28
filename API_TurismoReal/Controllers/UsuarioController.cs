@@ -140,6 +140,7 @@ namespace API_TurismoReal.Controllers
             {
                 Usuario usuario = creador.Usuario;
                 Persona persona = creador.Persona;
+                usuario.Username = usuario.Username.ToLower();
                 if (!userAgent.Equals("TurismoRealDesktop"))
                 {
                     usuario.Id_rol = 5;

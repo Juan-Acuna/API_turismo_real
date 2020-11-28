@@ -18,8 +18,8 @@ namespace API_TurismoReal.Controllers
         OracleCommandManager cmd = new OracleCommandManager(ConexionOracle.Conexion);
 
         [Authorize(Roles = "1,2,3,4")]
-        [HttpGet("asignado/{username}")]
-        public async Task<IActionResult> Asignado([FromRoute]String username)
+        [HttpGet("asignado/{id}")]
+        public async Task<IActionResult> Asignado([FromRoute]int id)
         {
             if (!ConexionOracle.Activa)
             {
@@ -29,10 +29,10 @@ namespace API_TurismoReal.Controllers
                     return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
-            var l = await cmd.Find<LocalidadUsuario>("Username", username.ToLower());
-            if (l.Count > 0)
+            var l = await cmd.Get<LocalidadUsuario>(id);
+            if (l != null)
             {
-                var u = await cmd.Get<Usuario>(l[0].Username);
+                var u = await cmd.Get<Usuario>(l.Username);
                 var p = await cmd.Get<Persona>(u.Rut);
                 return Ok(new PersonaUsuario { Usuario = u, Persona = p });
             }
@@ -76,7 +76,6 @@ namespace API_TurismoReal.Controllers
             }
             return BadRequest();
         }
-
         [ProducesResponseType(typeof(List<Localidad>), 200)]
         [ProducesResponseType(typeof(MensajeError), 400)]
         [ProducesResponseType(typeof(MensajeError), 500)]
@@ -101,12 +100,12 @@ namespace API_TurismoReal.Controllers
                 }
                 return BadRequest(MensajeError.Nuevo("No se encontraron localidades"));
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return StatusCode(500, MensajeError.Nuevo(e.Message));
             }
         }
-        [ProducesResponseType(typeof(Localidad), 200)]
+        [ProducesResponseType(typeof(ProxyLocalidad), 200)]
         [ProducesResponseType(typeof(MensajeError), 400)]
         [ProducesResponseType(typeof(MensajeError), 500)]
         [ProducesResponseType(typeof(MensajeError), 504)]
@@ -127,6 +126,87 @@ namespace API_TurismoReal.Controllers
                 if (l != null)
                 {
                     return Ok(l);
+                }
+                return BadRequest(MensajeError.Nuevo("No se encontró la localidad"));
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, MensajeError.Nuevo(e.Message));
+            }
+        }
+        [ProducesResponseType(typeof(List<ProxyLocalidad>), 200)]
+        [ProducesResponseType(typeof(MensajeError), 400)]
+        [ProducesResponseType(typeof(MensajeError), 500)]
+        [ProducesResponseType(typeof(MensajeError), 504)]
+        [HttpGet("proxy")]
+        public async Task<IActionResult> GetProxy()
+        {
+            if (!ConexionOracle.Activa)
+            {
+                ConexionOracle.Open();
+                if (!ConexionOracle.Activa)
+                {
+                    return StatusCode(504, ConexionOracle.NoConResponse);
+                }
+            }
+            try
+            {
+                List<Localidad> l = await cmd.GetAll<Localidad>();
+                if (l.Count > 0)
+                {
+                    List<ProxyLocalidad> pl = new List<ProxyLocalidad>();
+                    foreach(var loc in l)
+                    {
+                        var p = new ProxyLocalidad();
+                        p.Localidad = loc;
+                        p.Asignado = false;
+                        var x = await cmd.Get<LocalidadUsuario>(loc.Id_localidad);
+                        if (x != null)
+                        {
+                            p.Asignado = true;
+                            p.Username = x.Username;
+                        }
+                        pl.Add(p);
+                    }
+                    return Ok(pl);
+                }
+                return BadRequest(MensajeError.Nuevo("No se encontraron localidades"));
+            }
+            catch(Exception e)
+            {
+                return StatusCode(500, MensajeError.Nuevo(e.Message));
+            }
+        }
+        [ProducesResponseType(typeof(ProxyLocalidad), 200)]
+        [ProducesResponseType(typeof(MensajeError), 400)]
+        [ProducesResponseType(typeof(MensajeError), 500)]
+        [ProducesResponseType(typeof(MensajeError), 504)]
+        [HttpGet("proxy/{id}")]
+        public async Task<IActionResult> GetProxy([FromRoute]int id)
+        {
+            if (!ConexionOracle.Activa)
+            {
+                ConexionOracle.Open();
+                if (!ConexionOracle.Activa)
+                {
+                    return StatusCode(504, ConexionOracle.NoConResponse);
+                }
+            }
+            try
+            {
+                Localidad l = await cmd.Get<Localidad>(id);
+                if (l != null)
+                {
+                    var lu = await cmd.Get<LocalidadUsuario>(id);
+                    ProxyLocalidad pl = new ProxyLocalidad();
+                    pl.Localidad = l;
+                    pl.Asignado = false;
+                    if (lu != null)
+                    {
+                        pl.Username = lu.Username;
+                        pl.Asignado = true;
+                    }
+                    return Ok(lu);
                 }
                 return BadRequest(MensajeError.Nuevo("No se encontró la localidad"));
             }

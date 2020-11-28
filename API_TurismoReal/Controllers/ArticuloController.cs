@@ -65,10 +65,14 @@ namespace API_TurismoReal.Controllers
                     return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
-            var da = (await cmd.Find<DeptoArticulo>("Id_articulo", id))[0];
-            if (await cmd.Delete(da))
+            var x = await cmd.Find<DeptoArticulo>("Id_articulo",id);
+            if (x.Count > 0)
             {
-                return Ok();
+                var da = x[0];
+                if (await cmd.Delete(da))
+                {
+                    return Ok();
+                }
             }
             return BadRequest();
         }
@@ -107,6 +111,66 @@ namespace API_TurismoReal.Controllers
             if (a != null)
             {
                 return Ok(a);
+            }
+            return BadRequest();
+        }
+        [Authorize(Roles = "1,2")]
+        [HttpGet("proxy")]
+        public async Task<IActionResult> GetProxy()
+        {
+            if (!ConexionOracle.Activa)
+            {
+                ConexionOracle.Open();
+                if (!ConexionOracle.Activa)
+                {
+                    return StatusCode(504, ConexionOracle.NoConResponse);
+                }
+            }
+            List<Articulo> art = await cmd.GetAll<Articulo>();
+            if (art.Count > 0)
+            {
+                List<ProxyArticulo> lista = new List<ProxyArticulo>();
+                foreach(var a in art)
+                {
+                    var pa = new ProxyArticulo();
+                    pa.Articulo = a;
+                    pa.Asignado = false;
+                    var x = await cmd.Find<DeptoArticulo>("Id_articulo",a.Id_articulo);
+                    if (x.Count > 0)
+                    {
+                        pa.Asignado = true;
+                        pa.Depto = x[0].Id_depto;
+                    }
+                    lista.Add(pa);
+                }
+                return Ok(lista);
+            }
+            return BadRequest();
+        }
+        [Authorize(Roles = "1,2")]
+        [HttpGet("proxy/{id}")]
+        public async Task<IActionResult> GetProxy([FromRoute]int id)
+        {
+            if (!ConexionOracle.Activa)
+            {
+                ConexionOracle.Open();
+                if (!ConexionOracle.Activa)
+                {
+                    return StatusCode(504, ConexionOracle.NoConResponse);
+                }
+            }
+            Articulo a = await cmd.Get<Articulo>(id);
+            if (a != null)
+            {
+                var pa = new ProxyArticulo();
+                pa.Articulo = a;
+                pa.Asignado = false;
+                var x = await cmd.Find<DeptoArticulo>("Id_articulo",id);
+                if (x.Count > 0)
+                {
+                    pa.Depto = x[0].Id_depto;
+                }
+                return Ok(pa);
             }
             return BadRequest();
         }
