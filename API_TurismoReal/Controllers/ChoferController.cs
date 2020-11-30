@@ -190,11 +190,10 @@ namespace API_TurismoReal.Controllers
             {
                 return StatusCode(500, e.Message + " | " + e.Source + " | " + e.StackTrace);
             }
-            
         }
         [Authorize(Roles = "1")]
-        [HttpDelete]
-        public async Task<IActionResult> Delete([FromBody]Chofer chofer)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete([FromRoute]int id)
         {
             if (!ConexionOracle.Activa)
             {
@@ -204,8 +203,11 @@ namespace API_TurismoReal.Controllers
                     return StatusCode(504, ConexionOracle.NoConResponse);
                 }
             }
+            Chofer chofer = await cmd.Get<Chofer>(id);
+            var p = await cmd.Get<Persona>(chofer.Rut);
             if (await cmd.Delete(chofer))
             {
+                await cmd.Delete(p);
                 return Ok();
             }
             return BadRequest();
