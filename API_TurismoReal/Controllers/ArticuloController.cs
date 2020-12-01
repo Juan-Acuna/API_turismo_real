@@ -49,6 +49,18 @@ namespace API_TurismoReal.Controllers
             }
             if (await cmd.Insert(da,false))
             {
+                var d = await cmd.Get<Departamento>(da.Id_depto);
+                var l = await cmd.Get<Localidad>(d.Id_localidad);
+                var lu = await cmd.Get<LocalidadUsuario>(l.Id_localidad);
+                var a = await cmd.Get<Articulo>(da.Id_articulo);
+                Notificacion n = new Notificacion();
+                n.Username = lu.Username;
+                n.Fecha = DateTime.Now;
+                n.Titulo = "Asignación de artículo a departamento";
+                n.Contenido = "Se ha asignado el articulo \""+a.Nombre+"\"(ID:"+a.Id_articulo+") al departamento \""+d.Nombre+"\"."
+                    +"\n\nEl artículo debe ser dispuesto en el departamento a la brevedad.";
+                n.Visto = '0';
+                await cmd.Insert(n);
                 return Ok();
             }
             return BadRequest();
@@ -71,6 +83,18 @@ namespace API_TurismoReal.Controllers
                 var da = x[0];
                 if (await cmd.Delete(da))
                 {
+                    var d = await cmd.Get<Departamento>(da.Id_depto);
+                    var l = await cmd.Get<Localidad>(d.Id_localidad);
+                    var lu = await cmd.Get<LocalidadUsuario>(l.Id_localidad);
+                    var a = await cmd.Get<Articulo>(da.Id_articulo);
+                    Notificacion n = new Notificacion();
+                    n.Username = lu.Username;
+                    n.Fecha = DateTime.Now;
+                    n.Titulo = "Artículo desasignado del departamento";
+                    n.Contenido = "Se ha desasignado el articulo \"" + a.Nombre + "\"(ID:" + a.Id_articulo + ") del departamento \"" + d.Nombre + "\"."
+                        + "\n\nEl artículo debe ser retirado del departamento a la brevedad.";
+                    n.Visto = '0';
+                    await cmd.Insert(n);
                     return Ok();
                 }
             }

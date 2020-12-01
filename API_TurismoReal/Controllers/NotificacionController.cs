@@ -58,6 +58,8 @@ namespace API_TurismoReal.Controllers
                 var notif = await cmd.Get<Notificacion>(id);
                 if (notif != null)
                 {
+                    notif.Visto = '1';
+                    await cmd.Update(notif);
                     return Ok(notif);
                 }
                 return BadRequest();

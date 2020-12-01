@@ -234,7 +234,7 @@ namespace API_TurismoReal.Controllers
             try
             {
                 String n = "";
-                foreach (var c in l.Nombre.Split(' '))
+                foreach (var c in l.Nombre.ToString().Split(' '))
                 {
                     n += " " + Tools.Capitalize(c);
                 }
@@ -277,7 +277,7 @@ namespace API_TurismoReal.Controllers
                 if (data.Nombre != null)
                 {
                     String n = "";
-                    foreach (var c in data.Nombre.Split(' '))
+                    foreach (var c in data.Nombre.ToString().Split(' '))
                     {
                         n += " " + Tools.Capitalize(c);
                     }
