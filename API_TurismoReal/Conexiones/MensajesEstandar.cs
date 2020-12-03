@@ -41,13 +41,14 @@ namespace API_TurismoReal.Conexiones
         static String AServicio = "Recordatorio de servicio.";
         static String MServicio = "";
         static String ABaja = "Su cuenta ha sido desactivada.";
-        static String MBaja = "";
+        static String MBaja = "su cuenta ha sido desactivada.";
         static String AMulta = "Usted ha sido multado.";
         static String MMulta = "VALE POR UNA NOTIFICACION DE MULTA";
         static String AActivar = "Activacion de cuenta de {rol} en Turismo Real.";
         static String MActivar = "<div><h1>¡Bienvenido a turismo real!</h1><hr><p>Se ha creado una cuenta de {rol}"
         +" asociada a este correo electronico y para poder hacer uso de esta, es necesario que establezca una contraseña para iniciar sesión</p>"
-        +"<p>Para establecer su contraseña haga click <a href=\"https://turismoreal.xyz/api/interno/gestion/activar/{usuario}/{codigo}.{salt}\">Aquí</a>.</p></div>";
+        + "<p>Para establecer su contraseña haga click "
+        +"<a href=\"http://localhost/Agencia/funciones/restablecer.php?username={username}&codigo={codigo}&sal={salt}&origen=api\">Aquí</a>.</p></div>";
 
         MensajeCorreo recuperarClave = new MensajeCorreo(ClienteSmtp.DireccionEmail,ARecuperarClave, MRecuperarClave);
         MensajeCorreo asignacionChofer = new MensajeCorreo(ClienteSmtp.DireccionEmail, AAsignacion, MAsignacion);

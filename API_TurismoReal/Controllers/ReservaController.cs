@@ -262,9 +262,22 @@ namespace API_TurismoReal.Controllers
                 }
             }
             var r = await cmd.Get<Reserva>(id);
-            if (await cmd.Delete(r))
+            var ts = await cmd.Find<Transaccion>("Id_reserva", r.Id_reserva);
+            bool b = false;
+            foreach(var t in ts)
             {
-                return Ok();
+                b = await cmd.Delete(t);
+                if (b)
+                {
+                    break;
+                }
+            }
+            if (b)
+            {
+                if (await cmd.Delete(r))
+                {
+                    return Ok();
+                }
             }
             return BadRequest();
         }

@@ -242,9 +242,24 @@ namespace API_TurismoReal.Controllers
                 l.Nombre = n;
                 if (await cmd.Insert(l))
                 {
-                    if (!Directory.Exists(Secret.RUTA_RAIZ + "img\\" + Tools.ToUrlCompatible(l.Nombre) + "\\"))
+                    if (!Directory.Exists(Secret.RUTA_RAIZ + "img\\" + Tools.ToUrlCompatible(l.Nombre.ToLower()) + "\\"))
                     {
-                        Directory.CreateDirectory(Secret.RUTA_RAIZ + "img\\" + Tools.ToUrlCompatible(l.Nombre));
+                        Directory.CreateDirectory(Secret.RUTA_RAIZ + "img\\" + Tools.ToUrlCompatible(l.Nombre.ToLower()));
+                    }
+                    var ds = await cmd.Find<Departamento>("Id_localidad", l.Id_localidad);
+                    if (ds.Count > 0)
+                    {
+                        foreach(var d in ds)
+                        {
+                            var fs = await cmd.Find<Foto>("Id_depto",d.Id_depto);
+                            if (fs.Count > 0)
+                            {
+                                foreach(var f in fs)
+                                {
+                                    f.Ruta= "http://turismoreal.xyz/img/" + Tools.ToUrlCompatible(l.Nombre.ToLower()) + "/" + Tools.ToUrlCompatible(d.Nombre.ToLower()) + "/" + f.Ruta.Split('/').Last();
+                                }
+                            }
+                        }
                     }
                     return Ok(await cmd.Find<Localidad>("Nombre",l.Nombre));
                 }
