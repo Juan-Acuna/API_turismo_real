@@ -145,7 +145,7 @@ namespace API_TurismoReal.Controllers
                     n.Contenido = "Se ha asignado una mantención al departamento \"" + d.Nombre + "\"(ID:" + d.Id_depto + ") para el día <b>" + m.Fecha.ToShortDateString() + "</b>."
                         + "\n\nLa mantención debe ser llevada a cabo a la brevedad.";
                     n.Visto = '0';
-                    n.Link = "http://localhost/agencia/vistas/gestion/vermantencion.php";
+                    n.Link = "http://localhost/agencia/vistas/gestion/index.php#vermantencion";
                     await cmd.Insert(n);
                     return Ok();
                 }
