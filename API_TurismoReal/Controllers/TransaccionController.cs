@@ -160,8 +160,8 @@ namespace API_TurismoReal.Controllers
                     Khipu.Client.Configuration.Secret = Secret.T_SECRET_KEY;
                     PaymentsApi pago = new PaymentsApi();
                     PaymentsCreateResponse response = pago.PaymentsPost(t.Comentario, "CLP", t.Monto, transactionId: trId,
-                        returnUrl: ServerURLs.PagarUrl(Acccion.repay, t.Id_reserva, trId),
-                        cancelUrl: ServerURLs.PagarUrl(Acccion.cancel, t.Id_reserva, trId, t.Monto));
+                        returnUrl: ServerURLs.PagarUrl(Accion.repay, t.Id_reserva, trId),
+                        cancelUrl: ServerURLs.PagarUrl(Accion.cancel, t.Id_reserva, trId, t.Monto));
                     /**/
                     t.Listo = '1';
                     var r = await cmd.Get<Reserva>(t.Id_reserva);

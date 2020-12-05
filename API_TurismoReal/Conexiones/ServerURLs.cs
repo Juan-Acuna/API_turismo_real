@@ -7,14 +7,19 @@ namespace API_TurismoReal.Conexiones
 {
     public static class ServerURLs
     {
-        static String URL_BASE = "http://localhost/agencia";
-        public static String FUNCIONES = URL_BASE + "/funciones";
-        public static String VISTAS = URL_BASE + "/vistas";
-        public static String DEPTOS = URL_BASE + "/deptos";
-        public static String CUENTA = URL_BASE + "/cuenta";
-        public static String PagarUrl(Acccion act, object idReserva, object idTransaccion, object monto = null)
+        static String URL_BASE          = "http://localhost/agencia";
+        public static String FUNCIONES  = URL_BASE  + "/controladores";
+        public static String VISTAS     = URL_BASE  + "/vistas";
+        public static String DEPTOS     = VISTAS    + "/deptos";
+        public static String CUENTA     = VISTAS    + "/cuenta";
+        public static String GESTION    = VISTAS    + "/gestion";
+        public static String GetRutaGestion(Gestion opcion)
         {
-            if(act== Acccion.repay)
+            return GESTION + "/index.php#"+opcion.ToString();
+        }
+        public static String PagarUrl(Accion act, object idReserva, object idTransaccion, object monto = null)
+        {
+            if(act== Accion.repay)
             {
                 return FUNCIONES + "/preparacion-pago.php?rs=" + idReserva.ToString() + "&tr=" + idTransaccion.ToString();
             }
@@ -24,11 +29,21 @@ namespace API_TurismoReal.Conexiones
             }
         } 
     }
-    public enum Acccion
+    public enum Accion
     {
         pay,
         repay,
         commit,
         cancel
+    }
+    public enum Gestion
+    {
+        Multas,
+        Reservas,
+        Servicios,
+        Transporte,
+        CheckIn,
+        CheckOut,
+        Mantenciones
     }
 }

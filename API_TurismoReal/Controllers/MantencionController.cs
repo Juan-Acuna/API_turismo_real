@@ -145,7 +145,7 @@ namespace API_TurismoReal.Controllers
                     n.Contenido = "Se ha asignado una mantención al departamento \"" + d.Nombre + "\"(ID:" + d.Id_depto + ") para el día <b>" + m.Fecha.ToShortDateString() + "</b>."
                         + "\n\nLa mantención debe ser llevada a cabo a la brevedad.";
                     n.Visto = '0';
-                    n.Link = "http://localhost/agencia/vistas/gestion/index.php#vermantencion";
+                    n.Link = ServerURLs.GetRutaGestion(Gestion.Mantenciones);
                     await cmd.Insert(n);
                     return Ok();
                 }
@@ -156,9 +156,9 @@ namespace API_TurismoReal.Controllers
                 return StatusCode(500, MensajeError.Nuevo(e.Message));
             }
         }
-        [Authorize(Roles = "1")]
-        [HttpPatch("{id}/{depto}")]
-        public async Task<IActionResult> Patch([FromRoute]int id, [FromRoute]int depto)
+        [Authorize(Roles = "1,4")]
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> Patch([FromRoute]int id)
         {
             if (!ConexionOracle.Activa)
             {
@@ -174,7 +174,7 @@ namespace API_TurismoReal.Controllers
                 m.Hecho = '1';
                 if (await cmd.Update(m))
                 {
-                    var d = await cmd.Get<Departamento>(depto);
+                    var d = await cmd.Get<Departamento>(m.Id_depto);
                     d.Id_estado = 2;
                     await cmd.Update(d);
                     return Ok();
@@ -186,9 +186,9 @@ namespace API_TurismoReal.Controllers
                 return StatusCode(500, MensajeError.Nuevo(e.Message));
             }
         }
-        [Authorize(Roles = "1")]
-        [HttpPatch("inhabitable/{id}/{depto}")]
-        public async Task<IActionResult> PatchError([FromRoute]int id, [FromRoute]int depto)
+        [Authorize(Roles = "1,4")]
+        [HttpPatch("inhabitable/{id}")]
+        public async Task<IActionResult> PatchError([FromRoute]int id)
         {
             if (!ConexionOracle.Activa)
             {
@@ -204,7 +204,7 @@ namespace API_TurismoReal.Controllers
                 m.Hecho = '1';
                 if (await cmd.Update(m))
                 {
-                    var d = await cmd.Get<Departamento>(depto);
+                    var d = await cmd.Get<Departamento>(m.Id_depto);
                     d.Id_estado = 5;
                     await cmd.Update(d);
                     return Ok();
