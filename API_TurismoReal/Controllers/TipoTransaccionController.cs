@@ -16,7 +16,7 @@ namespace API_TurismoReal.Controllers
     {
         OracleCommandManager cmd = new OracleCommandManager(ConexionOracle.Conexion);
 
-        [Authorize(Roles = "1")]
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> Get()
         {
@@ -35,7 +35,7 @@ namespace API_TurismoReal.Controllers
             }
             return BadRequest();
         }
-        [Authorize(Roles = "1")]
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> Get([FromRoute]int id)
         {

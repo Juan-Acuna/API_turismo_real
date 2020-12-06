@@ -88,7 +88,7 @@ namespace API_TurismoReal.Controllers
             }
             return BadRequest();
         }
-        //[Authorize(Roles = "1,3,5")]
+        [Authorize(Roles = "1,3,5")]
         [HttpPost("contratar/{r}.{s}")]
         public async Task<IActionResult> Contratar([FromRoute]int r, [FromRoute]int s)
         {

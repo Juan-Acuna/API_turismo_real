@@ -73,7 +73,7 @@ namespace API_TurismoReal.Controllers
             }
             return BadRequest();
         }
-        [Authorize]
+        [Authorize(Roles = "1,4")]
         [HttpPost("iniciarcheck/{id}")]
         public async Task<IActionResult> ConfirmarCheck([FromRoute]int id)
         {
@@ -249,7 +249,7 @@ namespace API_TurismoReal.Controllers
             }
             return BadRequest();
         }
-        [Authorize(Roles = "2,5")]
+        [Authorize(Roles = "1,2,5")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete([FromRoute]int id)
         {

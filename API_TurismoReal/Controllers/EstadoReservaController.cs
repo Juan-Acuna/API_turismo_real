@@ -71,7 +71,7 @@ namespace API_TurismoReal.Controllers
             }
             return BadRequest();
         }
-        [Authorize(Roles = "1,2,4")]
+        [Authorize(Roles = "1")]
         [HttpPatch("{id}")]
         public async Task<IActionResult> Patch([FromRoute]int id, [FromBody]dynamic data)
         {
@@ -94,7 +94,7 @@ namespace API_TurismoReal.Controllers
             }
             return BadRequest();
         }
-        [Authorize(Roles = "1,2")]
+        [Authorize(Roles = "1")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete([FromRoute]int id)
         {

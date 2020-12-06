@@ -55,7 +55,8 @@ namespace API_TurismoReal.Controllers
             }
             return BadRequest();
         }
-        [Authorize(Roles = "3,5")]
+
+        [Authorize(Roles = "1,3,5")]
         [HttpPost]
         public async Task<IActionResult> Post([FromBody]Viaje v)
         {
@@ -73,9 +74,28 @@ namespace API_TurismoReal.Controllers
             }
             return BadRequest();
         }
-        [Authorize(Roles = "3,5")]
+        [Authorize(Roles = "1,3,5")]
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> Patch([FromRoute]int id, [FromBody]dynamic data)
+        {
+            if (!ConexionOracle.Activa)
+            {
+                ConexionOracle.Open();
+                if (!ConexionOracle.Activa)
+                {
+                    return StatusCode(504, ConexionOracle.NoConResponse);
+                }
+            }
+            var v = await cmd.Get<Viaje>(id);
+            if (await cmd.Update(v))
+            {
+                return Ok();
+            }
+            return BadRequest();
+        }
+        [Authorize(Roles = "1,3,5")]
         [HttpPatch]
-        public async Task<IActionResult> Patch([FromBody]Viaje v)
+        public async Task<IActionResult> AsignarChofer([FromBody]Viaje v)
         {
             if (!ConexionOracle.Activa)
             {
@@ -91,7 +111,7 @@ namespace API_TurismoReal.Controllers
             }
             return BadRequest();
         }
-        [Authorize(Roles = "3,5")]
+        [Authorize(Roles = "1,3,5")]
         [HttpDelete]
         public async Task<IActionResult> Delete([FromBody]Viaje v)
         {

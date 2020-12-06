@@ -16,7 +16,7 @@ namespace API_TurismoReal.Controllers
     {
         MensajesEstandar Mensajes = MensajesEstandar.Instancia;
         OracleCommandManager cmd = new OracleCommandManager(ConexionOracle.Conexion);
-        //[Authorize]
+        [Authorize(Roles ="1")]
         [HttpPost("enviarcorreo/{correo}")]
         public IActionResult EnviarCorreo([FromRoute]String correo)
         {//ESTE METODO ESTA CONFIGURADO PARA SER DE PRUEBAS, CORREGIR MAS ADELANTE

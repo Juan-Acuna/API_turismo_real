@@ -15,7 +15,7 @@ namespace API_TurismoReal.Controllers
     {
 
         OracleCommandManager cmd = new OracleCommandManager(ConexionOracle.Conexion);
-        [Authorize(Roles = "1,5")]
+        [Authorize(Roles = "1,2,3,5")]
         [ProducesResponseType(typeof(List<PersonaAcompanante>),200)]
         [ProducesResponseType(typeof(MensajeError),400)]
         [ProducesResponseType(typeof(MensajeError), 500)]
@@ -54,7 +54,7 @@ namespace API_TurismoReal.Controllers
                 return StatusCode(500, MensajeError.Nuevo(e.Message));
             }
         }
-        [Authorize(Roles = "1,5")]
+        [Authorize(Roles = "1,2,3,5")]
         [ProducesResponseType(typeof(List<PersonaAcompanante>), 200)]
         [ProducesResponseType(typeof(MensajeError), 400)]
         [ProducesResponseType(typeof(MensajeError), 500)]
@@ -93,7 +93,7 @@ namespace API_TurismoReal.Controllers
                 return StatusCode(500, MensajeError.Nuevo(e.Message));
             }
         }
-        [Authorize(Roles = "1,5")]
+        [Authorize(Roles = "1,2,3,5")]
         [ProducesResponseType(typeof(PersonaAcompanante), 200)]
         [ProducesResponseType(typeof(MensajeError), 400)]
         [ProducesResponseType(typeof(MensajeError), 500)]

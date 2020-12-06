@@ -54,7 +54,7 @@ namespace API_TurismoReal.Controllers
             }
             return BadRequest();
         }
-        [Authorize(Roles = "2,4")]
+        [Authorize(Roles = "1,2,4")]
         [HttpPost]
         public async Task<IActionResult> Post([FromBody]Multa m)
         {
@@ -72,7 +72,7 @@ namespace API_TurismoReal.Controllers
             }
             return BadRequest();
         }
-        [Authorize(Roles = "2,4")]
+        [Authorize(Roles = "1,2,4")]
         [HttpPatch]
         public async Task<IActionResult> Patch([FromBody]Multa m)
         {

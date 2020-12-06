@@ -94,7 +94,7 @@ namespace API_TurismoReal.Controllers
             }
         }*/
 
-        [Authorize(Roles = "1")]
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> Get()
         {
@@ -113,7 +113,7 @@ namespace API_TurismoReal.Controllers
             }
             return BadRequest();
         }
-        [Authorize(Roles = "1")]
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> Get([FromRoute]int id)
         {
@@ -132,7 +132,7 @@ namespace API_TurismoReal.Controllers
             }
             return BadRequest();
         }
-        //[Authorize(Roles = "1,5")]
+        [Authorize(Roles = "1,2,5")]
         [HttpPost]
         public async Task<IActionResult> Post([FromBody]Transaccion t)
         {
